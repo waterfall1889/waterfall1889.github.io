@@ -4,7 +4,7 @@ import { projects } from '../data/projects'
 export default function Projects() {
   return (
     <section className="section">
-      <h1>项目作品</h1>
+      <h1>Projects</h1>
       <div className="card-grid">
         {projects.map((project) => (
           <Link key={project.slug} to={`/projects/${project.slug}`} className="card">

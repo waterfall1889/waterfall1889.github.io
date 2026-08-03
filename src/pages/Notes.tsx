@@ -3,7 +3,7 @@ import { notes } from '../data/notes'
 export default function Notes() {
   return (
     <section className="section">
-      <h1>课程学习笔记</h1>
+      <h1>Course Notes</h1>
       <div className="note-list">
         {notes.map((note) => (
           <div key={note.id} className="note-item">

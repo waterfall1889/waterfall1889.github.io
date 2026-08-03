@@ -16,25 +16,25 @@ export interface Project {
 export const projects: Project[] = [
   {
     slug: 'project-one',
-    title: '示例项目一',
+    title: 'Example Project One',
     period: '2025',
-    summary: '一句话概括这个项目做了什么。',
+    summary: 'One sentence summarizing what this project does.',
     description:
-      '在这里详细描述项目的背景、你负责的部分、使用的技术栈以及最终效果。可以分多段说明设计思路和遇到的挑战。',
+      'Describe the background of the project, the part you were responsible for, the tech stack used, and the final outcome. Feel free to split this into multiple paragraphs to explain the design and challenges.',
     tags: ['React', 'TypeScript'],
     links: [
-      { label: 'GitHub 仓库', url: 'https://github.com/waterfall1889' },
-      { label: '在线演示', url: '' },
+      { label: 'GitHub Repo', url: 'https://github.com/waterfall1889' },
+      { label: 'Live Demo', url: '' },
     ],
   },
   {
     slug: 'project-two',
-    title: '示例项目二',
+    title: 'Example Project Two',
     period: '2024',
-    summary: '一句话概括这个项目做了什么。',
+    summary: 'One sentence summarizing what this project does.',
     description:
-      '在这里详细描述项目的背景、你负责的部分、使用的技术栈以及最终效果。',
-    tags: ['Python', '数据分析'],
-    links: [{ label: 'GitHub 仓库', url: 'https://github.com/waterfall1889' }],
+      'Describe the background of the project, the part you were responsible for, the tech stack used, and the final outcome.',
+    tags: ['Python', 'Data Analysis'],
+    links: [{ label: 'GitHub Repo', url: 'https://github.com/waterfall1889' }],
   },
 ]

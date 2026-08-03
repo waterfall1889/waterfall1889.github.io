@@ -15,12 +15,12 @@ export interface Profile {
 }
 
 export const profile: Profile = {
-  name: '你的姓名',
-  role: '研究方向 / 身份定位（如：机器学习方向研究生）',
-  affiliation: '所在院校或机构',
-  bio: '在这里写一段简短的自我介绍：你的研究兴趣、正在做的事情，以及希望访问者了解的重点。建议控制在 2-4 句话。',
+  name: 'Zhu Zimo',
+  role: 'Your research focus / identity (e.g. Graduate Student in Machine Learning)',
+  affiliation: 'Your institution or lab',
+  bio: 'Write a short introduction here: your research interests, what you are currently working on, and what you want visitors to know. Two to four sentences is usually enough.',
   email: 'your-email@example.com',
-  location: '城市, 国家',
+  location: 'City, Country',
   links: [
     { label: 'GitHub', url: 'https://github.com/waterfall1889' },
     { label: 'Google Scholar', url: 'https://scholar.google.com' },

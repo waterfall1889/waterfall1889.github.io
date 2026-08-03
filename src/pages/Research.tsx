@@ -3,7 +3,7 @@ import { research } from '../data/research'
 export default function Research() {
   return (
     <section className="section">
-      <h1>科研履历</h1>
+      <h1>Research</h1>
       <ol className="timeline">
         {research.map((item) => (
           <li key={item.id} className="timeline-item">

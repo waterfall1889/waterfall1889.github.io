@@ -3,10 +3,10 @@ import { profile } from '../data/profile'
 import type { ReactNode } from 'react'
 
 const navItems = [
-  { to: '/', label: '主页' },
-  { to: '/research', label: '科研履历' },
-  { to: '/projects', label: '项目作品' },
-  { to: '/notes', label: '课程笔记' },
+  { to: '/', label: 'Home' },
+  { to: '/research', label: 'Research' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/notes', label: 'Notes' },
 ]
 
 export default function Layout({ children }: { children: ReactNode }) {

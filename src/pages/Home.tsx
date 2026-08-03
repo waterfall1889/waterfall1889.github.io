@@ -1,23 +1,30 @@
 import { profile } from '../data/profile'
 
 export default function Home() {
+  const initial = profile.name.trim().charAt(0).toUpperCase()
+
   return (
     <section className="section home">
       <div className="home-header">
-        <h1>{profile.name}</h1>
-        <p className="role">{profile.role}</p>
-        <p className="affiliation">{profile.affiliation}</p>
+        <div className="avatar" aria-hidden="true">
+          {initial}
+        </div>
+        <div>
+          <h1>{profile.name}</h1>
+          <p className="role">{profile.role}</p>
+          <p className="affiliation">{profile.affiliation}</p>
+        </div>
       </div>
 
       <p className="bio">{profile.bio}</p>
 
       <dl className="info-list">
         <div className="info-row">
-          <dt>邮箱</dt>
+          <dt>Email</dt>
           <dd>{profile.email}</dd>
         </div>
         <div className="info-row">
-          <dt>所在地</dt>
+          <dt>Location</dt>
           <dd>{profile.location}</dd>
         </div>
       </dl>

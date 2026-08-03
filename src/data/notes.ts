@@ -14,16 +14,16 @@ export interface CourseNote {
 export const notes: CourseNote[] = [
   {
     id: 'note-1',
-    course: '示例课程一（如：机器学习）',
-    term: '2024 秋',
-    description: '课程笔记整理，包含主要知识点梳理和习题总结。',
-    links: [{ label: '笔记链接', url: '' }],
+    course: 'Example Course One (e.g. Machine Learning)',
+    term: 'Fall 2024',
+    description: 'Course notes covering the main concepts and problem-set summaries.',
+    links: [{ label: 'Notes link', url: '' }],
   },
   {
     id: 'note-2',
-    course: '示例课程二（如：概率论与数理统计）',
-    term: '2023 秋',
-    description: '课程笔记整理，包含主要知识点梳理和习题总结。',
-    links: [{ label: '笔记链接', url: '' }],
+    course: 'Example Course Two (e.g. Probability & Statistics)',
+    term: 'Fall 2023',
+    description: 'Course notes covering the main concepts and problem-set summaries.',
+    links: [{ label: 'Notes link', url: '' }],
   },
 ]

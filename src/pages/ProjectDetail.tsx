@@ -8,8 +8,8 @@ export default function ProjectDetail() {
   if (!project) {
     return (
       <section className="section">
-        <p>未找到该项目。</p>
-        <Link to="/projects">返回项目列表</Link>
+        <p>Project not found.</p>
+        <Link to="/projects">Back to projects</Link>
       </section>
     )
   }
@@ -17,7 +17,7 @@ export default function ProjectDetail() {
   return (
     <section className="section">
       <Link to="/projects" className="back-link">
-        ← 返回项目列表
+        ← Back to projects
       </Link>
       <h1>{project.title}</h1>
       <p className="card-period">{project.period}</p>
