@@ -1,6 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
 import { notes } from '../lib/notes'
 
 const categoryLabels = { course: 'Course', tech: 'Tech' } as const
@@ -36,7 +39,9 @@ export default function NoteDetail() {
         </div>
       )}
       <div className="note-content">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+          {note.content}
+        </ReactMarkdown>
       </div>
     </section>
   )
