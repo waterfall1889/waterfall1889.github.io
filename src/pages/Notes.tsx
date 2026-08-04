@@ -9,7 +9,6 @@ export default function Notes() {
           <div key={note.id} className="note-item">
             <div className="note-header">
               <h3>{note.course}</h3>
-              <span className="note-term">{note.term}</span>
             </div>
             <p>{note.description}</p>
             <div className="links">

@@ -16,14 +16,15 @@ export interface Profile {
 
 export const profile: Profile = {
   name: 'Zhu Zimo',
-  role: 'Your research focus / identity (e.g. Graduate Student in Machine Learning)',
-  affiliation: 'Your institution or lab',
-  bio: 'Write a short introduction here: your research interests, what you are currently working on, and what you want visitors to know. Two to four sentences is usually enough.',
-  email: 'your-email@example.com',
-  location: 'City, Country',
+  role: 'Undergraduate Student',
+  affiliation: 'Shanghai Jiao Tong University | Software Engineering',
+  bio: 'I am an undergraduate student in Software Engineering at Shanghai Jiao Tong University, with research interests in Large Language Models, Natural Language Processing, and Machine Learning. My work focuses on developing intelligent systems through model optimization, data-centric approaches, and AI applications. I have experience in full-stack engineering and AI projects, and I am interested in exploring the intersection of foundation models and real-world applications.',
+  email: 'waterfall1889@sjtu.edu.cn',
+  location: 'Shanghai, China',
   links: [
     { label: 'GitHub', url: 'https://github.com/waterfall1889' },
-    { label: 'Google Scholar', url: 'https://scholar.google.com' },
-    { label: 'CV', url: '/cv.pdf' },
+    { label: 'LinkedIn', url: 'https://www.linkedin.com/in/zimo-zhu-9155a7371/' },
+    // { label: 'Google Scholar', url: 'https://scholar.google.com' },
+    // { label: 'CV', url: '/cv.pdf' },
   ],
 }

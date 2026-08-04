@@ -6,7 +6,6 @@ export interface NoteLink {
 export interface CourseNote {
   id: string
   course: string
-  term: string
   description: string
   links: NoteLink[]
 }
@@ -14,15 +13,31 @@ export interface CourseNote {
 export const notes: CourseNote[] = [
   {
     id: 'note-1',
-    course: 'Example Course One (e.g. Machine Learning)',
-    term: 'Fall 2024',
+    course: 'Introduction to Computer Systems I',
     description: 'Course notes covering the main concepts and problem-set summaries.',
     links: [{ label: 'Notes link', url: '' }],
   },
   {
     id: 'note-2',
-    course: 'Example Course Two (e.g. Probability & Statistics)',
-    term: 'Fall 2023',
+    course: 'Introduction to Computer Systems II',
+    description: 'Course notes covering the main concepts and problem-set summaries.',
+    links: [{ label: 'Notes link', url: '' }],
+  },
+  {
+    id: 'note-3',
+    course: 'Computer System Engineering',
+    description: 'Course notes covering the main concepts and problem-set summaries.',
+    links: [{ label: 'Notes link', url: '' }],
+  },
+  {
+    id: 'note-4',
+    course: 'Discrete Mathematics',
+    description: 'Course notes covering the main concepts and problem-set summaries.',
+    links: [{ label: 'Notes link', url: '' }],
+  },
+  {
+    id: 'note-5',
+    course: 'Architecture of Applications',
     description: 'Course notes covering the main concepts and problem-set summaries.',
     links: [{ label: 'Notes link', url: '' }],
   },
