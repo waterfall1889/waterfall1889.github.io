@@ -20,7 +20,7 @@ export default function ProjectDetail() {
         ← Back to projects
       </Link>
       <h1>{project.title}</h1>
-      <p className="card-period">{project.period}</p>
+      {project.period && <p className="card-period">{project.period}</p>}
       <div className="tags">
         {project.tags.map((tag) => (
           <span key={tag} className="tag">

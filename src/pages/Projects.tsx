@@ -9,7 +9,7 @@ export default function Projects() {
         {projects.map((project) => (
           <Link key={project.slug} to={`/projects/${project.slug}`} className="card">
             <h3>{project.title}</h3>
-            <p className="card-period">{project.period}</p>
+            {project.period && <p className="card-period">{project.period}</p>}
             <p>{project.summary}</p>
             <div className="tags">
               {project.tags.map((tag) => (
