@@ -1,0 +1,544 @@
+---
+
+title: File Systems
+
+category: Course
+
+tags: [File System, Operation System, Storage]
+
+date: 2025-10-30
+
+--- 
+
+# File Systems
+
+## 1 文件的基本特征
+
+- **Durable**: 断电后不能消失，具有持久性
+
+- **Has a name**：需要有自己的文件名
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-01-07-image.png" title="" alt="" width="675">
+
+## 2 两个重要的抽象
+
+- block and sector
+
+- Sector 一般512B/4KB，常用的接口有read 和 write
+
+- 但是sector和文件系统不同，读写的API一般不暴露给程序员。
+
+- 所以需要对这种API进行抽象。程序员只需要得知文件名、偏移量即可。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-05-23-image.png" title="" alt="" width="578">
+
+## 3 大数组文件系统
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-05-40-image.png" title="" alt="" width="596">
+
+- 设计简单，而且一目了然
+
+- 但是这样问题很多：我怎么知道某个位置是否被用过了？然后，当文件占用了不止一个block时，无法说明某两个block或者多个block构成了同一个文件。因此磁盘提供的API远远不能满足需要。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-09-23-image.png" title="" alt="" width="527">
+
+## 4 Inode文件系统
+
+### 4.1 基本分级
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-10-35-image.png" title="" alt="" width="555">
+
+### 4.2 L1:Block Layer
+
+对于文件系统而言，最小的单位就是block。Sector是磁盘的最小单位。
+
+4KB block = 4 continuous sectors
+
+在工程上，block size的选择实际上存在 trade off。
+
+**选择较大的块大小**
+优点：
+
+- 更高的顺序读写性能（吞吐量）：一次I/O操作可以传输更多连续的数据，这减少了对存储设备（尤其是机械硬盘，因为磁头寻道次数减少）的I/O请求次数。非常适合顺序读写为主的场景，如大型视频文件处理、科学计算、数据仓库的批量ETL作业等。
+
+- 元数据开销更小：文件系统需要元数据（如inode中的指针）来记录文件块的位置。文件总大小固定时，块越大，需要的块数量就越少，从而元数据也更小、更简单，管理开销更低。例如，存储一个1GB的文件，使用4KB块需要262,144个块地址；而使用64KB块只需要16,384个地址，减少了94%。
+
+- 更适合现代高速存储设备：SSD的读写单位（Page）和擦除单位（Block）都比较大（例如16KB、512KB）。使用较大的文件系统块可以更好地与SSD的物理特性对齐，减少写入放大，提升寿命和性能。
+
+缺点：
+
+- 内部碎片严重（空间利用率低）：这是最大的缺点。每个文件至少占用一个块。如果一个块大小是64KB，但只存储一个1KB的文件，那么这个块剩下的63KB空间就被浪费了，无法被其他文件使用。平均来看，每个文件会浪费大约半个块大小的空间。如果文件系统中有大量小文件，空间浪费会非常惊人。
+
+- 可能降低随机读写性能：当应用程序只需要读取文件的一小部分（例如，从一个大数据库文件中读取几行数据）时，系统却不得不将整个大块（比如64KB）加载到内存中。这浪费了宝贵的I/O带宽和内存缓存空间，导致延迟增加。
+
+**选择较小的块大小**
+优点：
+
+- 内部碎片少（空间利用率高）：同样存储一个1KB的文件，使用4KB的块只浪费3KB空间，而使用64KB块会浪费63KB。对于存储大量小文件的系统（如邮件服务器、代码仓库、配置文件目录），小块能极大地节省存储空间。
+
+- 更好的随机读写性能：当需要更新文件的一小部分时，只需要在内存和磁盘之间传输相关的小块，I/O更精确，延迟更低，也更节省内存缓存。
+
+缺点：
+
+- 顺序读写性能差（吞吐量低）：读取一个大型文件需要发起大量的I/O请求。在机械硬盘上，这可能导致频繁的磁头寻道，成为性能瓶颈。即使对于SSD，大量的微小I/O请求也可能无法充分利用其高并发带宽。
+
+- 元数据开销巨大：存储大文件需要非常多的块地址，导致元数据体积庞大。这可能需要更复杂的数据结构（如间接块）来管理，增加了文件系统自身的开销和复杂性。
+
+### 4.3 Free block管理：bitmap
+
+<img title="" src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-17-09-image.png" alt="" width="355">
+
+主要包括以下部分：
+
+- Boot Block（引导块）
+
+- Super Block（超级块）
+
+- Bitmap for free blocks（空闲块位图）
+
+- File blocks（文件块）
+
+#### 4.3.1 Boot Block 引导块
+
+- 引导块是磁盘的第一个块（通常是扇区，但文件系统中通常以多个扇区为一个块），用于存储系统的引导程序（bootstrap code）。当计算机启动时，BIOS会读取磁盘的引导块，并将控制权交给引导块中的代码，从而加载操作系统。
+
+- 即使一个磁盘不包含操作系统（例如，只是一个数据磁盘），文件系统仍然可能保留引导块，为了兼容性和标准布局。
+
+#### 4.3.2 Super Block 超级块
+
+- 超级块是文件系统的元数据块，它包含了关于整个文件系统的信息。超级块通常位于引导块之后，是文件系统的心脏，没有超级块，文件系统就无法被识别和使用。
+
+- 超级块中通常包含以下信息：
+  
+  - 文件系统的类型（例如ext2, ext3, ext4等）
+  
+  - 文件系统的大小（以块为单位）
+  
+  - 文件系统中空闲块的数量
+  
+  - 文件系统中空闲inode的数量
+  
+  - 块大小（例如1024, 2048, 4096字节等）
+  
+  - 文件系统的挂载信息（如挂载时间、最后一次写入时间等）
+  
+  - 文件系统的状态（如“干净”或“脏”）
+  
+  - 其他关键元数据，如第一个数据块的位置、inode表的位置等。
+  
+  由于超级块非常重要，文件系统通常会在磁盘的不同位置保存多个超级块的备份，以防超级块损坏导致整个文件系统无法访问。
+
+### 4.4 L2:File Layer
+
+- 文件的本质：
+  
+  - 线性字节数组：文件在逻辑上是一个连续的字节序列
+  
+  - 任意长度：文件大小不受限制（实际受磁盘空间和文件系统限制）
+  
+  - 动态变化：可以增长或缩小
+
+- Inode的作用：
+  
+  - 元数据容器：存储文件的描述信息
+  
+  - 块映射表：记录文件数据在磁盘上的实际位置
+    
+    ```cpp
+    struct inode {
+     integer block_nums[N]; // 数据块指针数组（文件实际上放在哪些block里面）
+     integer size; // 文件实际大小（字节）
+    }
+    ```
+
+**问题：Inode信息应该存储在哪里？**
+
+答案：通常将Inode信息存储在磁盘的特定区域，**称为Inode表（Inode Table）**。在文件系统格式化时，会分配一个固定的区域用于存放所有文件的Inode。每个Inode有一个唯一的编号（Inode number），通过这个编号可以在Inode表中快速定位到对应的Inode。在磁盘上，文件系统通常被划分为几个部分：
+
+- 引导块（Boot Block）：用于系统启动。
+
+- 超级块（Super Block）：记录文件系统的整体信息，如Inode总数、数据块总数、空闲Inode和数据块的数量等。
+
+- Inode表（Inode Table）：存储所有Inode的数组，每个Inode对应一个文件（包括目录、设备文件等）的元数据。
+
+- 数据块（Data Blocks）：实际存储文件内容和目录结构的地方。
+
+当需要访问一个文件时，首先通过文件路径在目录中找到对应的Inode编号，然后通过Inode编号在Inode表中找到对应的Inode，从中读取文件的元数据（如权限、大小、时间戳等）和数据块指针，最后通过数据块指针读取文件内容。
+
+### 4.5 Indirect Block
+
+- 当文件变大、超出直接指针数量时，就需要通过“间接块”来层层引用更多数据块。
+
+- inode 是文件的元信息结构，记录：
+  
+  - 文件类型、权限、大小、时间戳
+  
+  - 指向数据块的地址（指针）
+
+每个文件对应一个 inode。在小文件中，inode 直接保存数据块的地址；大文件则使用“多级间接寻址”结构。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-29-06-image.png" title="" alt="" width="509">
+
+- ①直接块（Direct Blocks）
+  inode 中包含若干个直接指针。每个直接指针直接指向一个数据块。
+  若文件大小 < 直接块能存储的总容量，则只需这些直接指针即可。
+  例：若每块 4KB，inode 有 12 个直接块 → 可存储 12×4KB=48KB。
+
+- ②一级间接块（Single Indirect Block）
+  当文件超过 48KB 后，inode 的下一个指针指向一个间接块（indirect block）。
+  这个间接块本身不存储数据，而是存储许多数据块地址。
+  例如：每个块能存 4B 的地址；一个 4KB 的间接块能存 4096/4=1024 个数据块地址；即可以额外扩展 1024×4KB=4MB 的文件大小。
+
+- ③二级间接块（Double Indirect Block）
+  inode 的下一个指针指向一个双重间接块（double indirect block）。
+  该块中存放的是若干个一级间接块的地址；
+  每个一级间接块又指向多个数据块。
+  理论最大存储为1024×1024×4KB=4GB。
+
+- ④三级间接块（Triple Indirect Block）
+  inode 最后的一个特殊指针指向三级间接块（triple indirect block）；
+  理论最大存储为1024×1024×1024×4KB=4TB。
+
+**这与CPU的页表完全不同，CPU的页表不能同一个结构出现多种不同等级的节点。**
+
+```c
+procedure INODE_TO_BLOCK(integer offset, inode i)-> block
+    o <- offset / BLOCKSIZE
+    b – INDEX_TO_BLOCK_NUMBER(i,o)
+    return BLOCK_NUMBER_TO_BLOCK(b)
+
+procedure INDEX_TO_BLOCK_NUMBER(inode i, integer index)-> integer // Simplified! 
+    return i.block_nums[index]
+```
+
+上述的函数是一个将文件内偏移量转换为实际磁盘块的核心文件系统函数。它实现了从文件的逻辑视图到物理存储的映射。
+
+<img title="" src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-37-42-image.png" alt="" width="607">
+
+第二个是一个简化版本（Simplified），假设 inode 的 block_nums 数组中，每个元素直接记录了文件第 index 个逻辑块对应的磁盘块号。在真实文件系统中，这个函数会更复杂：
+
+- 当 index 小于直接块数量时，直接取 block_nums[index]；
+
+- 否则要去间接块 / 双重间接块 / 三重间接块中递归查找；
+
+- 但此处被“simplified”，只展示了最直接的映射逻辑。
+
+### 4.6 L3:Inode Number Layer
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-38-58-image.png" title="" alt="" width="499">
+
+- 拿到inode的一种表示方式：inode number
+
+- 它实际上是L3 Inode Number Layer，是从inode number到inode的映射。（L1是Block Layer，block number 映射到 block data；L2是File Layer，是从Inode到 block number的映射）
+
+- 这里Inode本身的大小是固定的。Inode table用于存储Inode。Inode number实际上是Inode table里面的index或者offset。Inode table的大小在格式化时确定，这个大小与实际可能的文件数量有关。但是Inode number对于用户来说依然很不友好，因此还需要额外的映射简化使用。
+
+### 4.7 L4:File Name Layer
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-41-01-image.png" title="" alt="" width="326">
+
+file name layer，完全根据人的需要设计，从文件名映射到 Inode number。这个映射的数据结构存储于directory中。
+
+**注意：文件名不是文件本身的一部分。**
+
+Directory的存储两种策略：
+
+①下图中Inode table之后的位置。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-49-00-image.png" title="" alt="" width="471">
+
+缺点是很难确定实际的空间大小。可能出现空间不够用或者浪费。
+
+②利用inode存储directory：即目录本身就是一个Inode，也是一个文件。这其实是 Unix 文件系统设计中最优雅、最核心的思想之一 ——
+**“一切皆文件（Everything is a file）”**
+
+目录（directory）本身也是一种特殊文件，它的内容由 inode 管理，正如普通文件一样。这么设计的巧妙之处在于，
+
+- A.统一接口设计（Everything is a file）
+  
+  - 所有对象（普通文件、目录、设备、管道）都通过相同的 inode + block 机制管理；
+  
+  - 文件系统只需维护一种统一的抽象：文件的 inode；
+  
+  - 不需要额外为目录编写独立的存储机制；
+  
+  - 访问文件与访问目录的底层逻辑一致。
+
+- B.目录层次结构的自然递归
+  
+  - 由于目录本身也是文件，它可以包含子目录的 inode number。
+    这就自然支持了“树状文件系统结构”
+
+- C.简化命名与引用机制
+  
+  - 目录文件只存「名字 → inode号」，与 inode 本身解耦；
+  
+  - 文件可以被多个目录引用（即多个名字指向同一个 inode）；
+  
+  - 这就是 硬链接（hard link） 的实现基础
+
+- D.权限与访问控制统一
+  
+  - 由于目录有自己的 inode，它就有自己的权限位（rwx）；
+    
+    - r：能读取目录内容（列出文件名）；
+    
+    - x：能进入目录；
+    
+    - w：能修改目录（创建或删除文件）。
+  
+  - 因此，不需要额外的访问控制逻辑来区分“文件”和“目录”。
+
+- E.代码与实现简洁
+  
+  - 文件系统核心函数（例如 read_block(), get_inode(), write_block()）
+    不需要区分“这是目录还是文件”，因为：两者底层格式一致；
+  
+  - 唯一区别是文件的数据块内容类型不同。这使得文件系统代码：模块化、易于维护、易于扩展（例如挂载点、虚拟文件系统 VFS）。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-15-52-29-image.png" title="" alt="" width="509">
+
+获得文件名和所在目录后即可进行映射查找。Unix系统文件名最长限制是14个Bytes。如果某个目录有大量的文件，并不会出现问题，只需要使得directory更大即可。
+
+### 4.8 L5:Path Name Layer
+
+- 目录本身也是inode。Inode会存储type类型，说明文件的格式（目录还是普通文件regular file）。
+
+- Link：链接，用于为同一个 inode 创建一个新的文件名引用。即多个不同路径或名字，指向同一个 inode。例如：LINK("Mail/inbox/new-assignment", "assignment")在当前目录下创建一个名为 "assignment" 的文件名，它指向与 "Mail/inbox/new-assignment" 相同的 inode。原始文件 "Mail/inbox/new-assignment" 对应某个 inode（假设 inode=37）；执行 LINK 后，文件系统在目录中新增一个条目："assignment" → inode 37;inode 的引用计数（link count）增加 1；两个文件名指向同一个 inode。
+
+- UNLINK 用于删除一个文件名与 inode 之间的绑定关系，让某个文件名不再指向该 inode。工作原理：从目录中删除 “文件名 → inode号” 的映射；inode 的引用计数（link count）减 1；若引用计数变为 0：表示没有任何目录项再指向该 inode；文件系统释放该 inode 及其数据块；将 inode 和数据块放回 free-list（空闲列表）。
+  
+  **注意：UNLINK 删除的只是“名字”，而非立刻删除文件内容；只有当最后一个名字被删除后，文件数据才会被真正释放；即使文件名被删，但只要进程仍打开该文件（文件描述符未关闭），内容仍可读写，直到引用计数清零（refcnt为0）。**
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-01-00-image.png" title="" alt="" width="384">
+
+- LINK与快捷方式不同，快捷方式本身需要新建文件，而Link不需要。
+
+- LINK不可以出现循环，否则会造成资源无法回收而泄露。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-01-34-image.png" title="" alt="" width="534">
+
+- 因此规定，目录不得进行Link，而regular file是可以的，这是为了避免循环。唯一的例外是”.”和”..”。前者是当前目录的自我引用，后者是是父目录的引用（根目录 / 的 .. 特殊情况：它指向自己）。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-02-35-image.png" title="" alt="" width="538">
+
+### 4.9 Renaming
+
+通常的流程是，当在编辑某一个文件时，会创建一个临时文件，当编辑完成保存后临时文件会替代原来的文件。重命名意味着以下三个流程：
+
+```
+1 UNLINK(TO_NAME)
+2 LINK(FROM_NAME, TO_NAME)
+3 UNLINK(FROM_NAME)
+```
+
+但是问题是，如果发生了断电或者崩溃该如何恢复？这会造成原来的文件丢失被删除。在这里需要引入原子操作，
+
+```
+2 LINK(FROM_NAME, TO_NAME)
+3 UNLINK(FROM_NAME)
+```
+
+这两步在语义上应该被视为一个「原子操作」，
+它们合在一起就是 UNIX 中常见的：**rename(from_name, to_name)**
+
+### 4.10 L6:Absolute Path Layer
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-09-05-image.png" title="" alt="" width="524">
+
+根目录的. 和 .. 都指向自己
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-09-39-image.png" title="" alt="" width="539">
+
+文件系统中负责把用户输入的绝对路径（如 /a/b/c）逐级查目录，最终定位到目标 inode 的抽象层。
+
+### 4.11 L7:Symbolic Layer
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-11-52-image.png" title="" alt="" width="528">
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-12-04-image.png" title="" alt="" width="647">
+
+符号链接层是文件系统层次结构中的顶层，负责通过符号链接机制集成多个文件系统。
+
+- 跨文件系统集成：允许不同文件系统之间的无缝连接
+
+- 透明访问：用户可以通过符号链接透明地访问其他文件系统中的文件
+
+- 命名空间统一：创建统一的虚拟文件系统视图
+
+Hard link没有增加新的Inode，只是修改了目录，增加了一条directory entry，实际不存在的文件不可能增加hard link；hard link不可能跨文件系统去构建链接，比如电脑磁盘无法为外部USB建立Hard link。Hard link是双向等价的。
+Symbolic link（soft link）可以跨文件系统建立，因为它着眼于路径。Symbolic link实际上基于L7，更高的层级。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-13-42-image.png" title="" alt="" width="513">
+
+Symbolic link拥有独立inode，支持指向目录和跨文件系统，目标删除后会造成链接失效（悬空链接）。Hard link实际上是对同一个文件对应的inode number产生的别名，而soft link则是利用路径和文件名形成映射。
+
+**硬链接解析（直接）：**
+
+文件名 → inode编号 → 数据块
+
+**软链接解析（间接）：**
+
+链接文件名 → 链接inode → 读取目标路径 → 重新开始路径解析
+
+- 硬链接：多个文件名 → 同一个 inode → 同一份数据，本质是文件的多个入口。
+
+- 软链接：链接文件 → 自己的 inode → 保存目标路径 → 再次路径解析，本质是路径的快捷方式。
+
+<img title="" src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-16-00-image.png" alt="" width="718">
+
+**案例解释：**
+
+假设存在以下目录和软链接结构：
+
+- 真实目录：`/Scholarly/programs/www`
+- 根目录下有一个软链接：`/CSE-web` → `/Scholarly/programs/www`
+  在终端执行命令：
+
+```bash
+cd CSE-web
+cd ..
+```
+
+执行后，当前目录是哪里？
+
+**答案是：根目录 /**
+
+上述案例中理论上应该返回programs目录，但是由于bash的截获和human-friendly的设计，实际上bash会记住old pwd，返回根目录；如果忽略这种设计，输入`cd -P ..`则会返回programs目录。
+
+- Bash 默认使用逻辑模式（选项 -L）。
+
+- 当通过软链接进入目录时，Bash 不会把当前目录记录为物理路径 /Scholarly/programs/www。
+
+- 而是将环境变量 $PWD 更新为逻辑路径 /CSE-web。（虽然内核层面的进程当前目录确实指向了 /Scholarly/programs/www，但 Shell 本身记录的是逻辑路径。）
+
+".." 是在 Bash 的新默认上下文（逻辑上下文）中解析的，而不是由文件系统（物理上下文）解析的。
+
+在 Linux 中，软链接不仅影响“进入”时的路径，更关键的是，它改变了 Shell 对 .. 父目录的语义解释——默认情况下，.. 永远指向“你逻辑上来时的那个目录的父目录”，而不是“磁盘上真实位置的父目录”。
+
+## 5 API of Filesystems
+
+### 5.1 fopen and open
+
+- 两者存在很大区别：open是POSIX系统调用，fopen是C语言的标准库函数。
+
+- 前者返回一个FILE*文件流指针，后者返回一个fd文件描述符
+
+- 由于buffer存在，通常fopen会比open快很多，且减少了系统调用次数，适合频繁小数据读写。不过，fopen/fwrite实际上无法保证现在一定把数据写入磁盘，fsync后可以保证落盘。Open/write则可以保证一定落盘。
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-34-22-image.png" title="" alt="" width="523">
+
+- 由此可以看出，**Inode 不包含文件名，文件名不是文件的一部分**
+
+- 若增加hard link，ctime会发生变化，因为refcnt增加了。Ctime会跟踪inode元数据的变化时间。
+
+### 5.2 Open过程解析
+
+- 首先第一步，会检查是否有权限打开文件。Inode的userid和groupid进行验证判定是否有权限打开。随后，会修改atime。然后，返回一个File descriptor (fd)，用于后续的READ, WRITE, CLOSE操作。
+
+- Fd可以用于标准输出流和其他外设，Each process starts with three default open files：
+  
+  - standard in：fd = 0
+  
+  - standard out：fd = 1
+  
+  - standard error：fd = 2
+
+- Keyboard, display等等都有自己的fd（Allow a designer not to worry about input/output，Just read from fd 0 and write to fd 1）
+
+- Each process has its own fd name space：每个进程都有自己的fd命名空间。
+
+- OS内核出于安全考虑，不能把Inode信息暴露给用户，更不能返回Inode的指针。因此，提供了FD作为访问的辅助工具。这实际上满足了“最小信息泄露”的原则。
+
+- 同时，OS必须确保对于Inode等信息的修改必须借助OS完成，而不能绕开OS直接完成以免出现意想不到的问题。且同样的文件通过不同方式（Read-only/Read-and-write）打开获取的fd是不同的，使用FD有利于权限的控制。
+
+- **原则：返回的FD必须是当前可用FD最小的一个。** 因此多个线程同时打开文件时，会出现效率下降，因为此时会因为FD的分配带来加锁问题。这种设计实际上不利于效率的提高。（可以说，是一种历史遗留问题）
+
+### 5.3 File Cursor
+
+File Cursor（文件游标） 也称为文件位置指针，是操作系统为每个打开的文件维护的一个关键概念：
+
+- 作用：跟踪文件操作中的当前位置
+
+- 功能：记录下一次读写操作将在文件的哪个位置开始
+
+- 操作：可以通过 SEEK 操作改变位置
+
+Cursor可以选择是否share。
+
+- ①共享文件游标 
+  
+  - 场景：父进程将文件描述符传递给子进程
+  
+  - 机制：
+    
+    - 在UNIX系统中，子进程继承父进程所有打开的文件描述符
+    
+    - 父子进程共享同一个文件表项
+    
+    - 因此共享同一个文件游标
+
+- ②非共享文件游标
+  
+  - 场景：两个进程独立打开同一个文件
+  
+  - 机制：
+    
+    - 每个进程创建独立的文件表项
+    
+    - 每个文件表项维护独立的文件游标
+    
+    - 操作互不影响
+
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-08-06-16-48-54-image.png" title="" alt="" width="617">
+
+读写/更新的顺序也会影响性能以及安全性。
+
+下面三种读写顺序：
+
+- 更新块位图（标记块已占用） → 写入新数据 → 更新 inode（更新大小和指针）
+- 更新块位图 → 更新 inode → 写入新数据
+- 更新 inode → 更新块位图 → 写入新数据
+
+上述三者中，最理想的顺序是第一种。
+
+- 第一个顺序，如果第一和第二步间断电，会造成有一个"已分配但未使用"的块。
+
+- 第二、三步之间断电，数据已写入但文件不知道它的存在，不过fsck可以通过扫描发现孤儿数据块（可恢复）；不过整体很安全。
+
+- 第二、三个顺序，更新inode后崩溃会带来数据不一致的严重问题，因此最理想的顺序是第一个顺序。但是这种次序并不完美。
+
+### 5.4 Sync操作
+
+把cache写入磁盘，避免崩溃后的数据丢失。可以自动进行也可以手动，但是数据库中需要谨慎使用考虑。
+
+fsync() 是操作系统提供的系统调用，用于要求操作系统：将某个文件在内核缓存（page cache）中的修改数据，以及相关元数据，强制刷新到稳定存储介质（如磁盘 SSD/HDD）中，并确保在返回成功时数据已经持久化。
+
+```
+应用程序
+    |
+    | write()
+    v
+操作系统 Page Cache（内存缓存）
+    |
+    | fsync()
+    v
+磁盘缓存
+    |
+    v
+稳定存储介质（NAND/磁盘盘片）
+```
+
+不过需要注意的是，fsync返回成功可能是有欺骗性的（特别是在某些需要高频次重复调用的情况下，例如数据库持续写入和落盘）
+
+2018年，PostgreSQL出现过一个很大的数据安全问题：PostgreSQL 在写数据时会依赖 fsync() 来保证事务日志（WAL）和数据页真正落盘。如果某一次fsync失败，由于重复调用fsync，Postgres 还以为刷盘成功，继续写数据。这会带来数据文件可能部分损坏，但数据库继续对外提供服务，最终静默数据丢失/损坏。
+
+数据库的可靠性不仅取决于数据库代码，还取决于整个存储栈是否正确实现持久化语义。
+
+### 5.5 Delete操作
+
+- 在文件打开后，可能被删除掉。Windows等会进行保护（打开时被占用，不能删除），但是很多文件系统没有这种保护。当文件被一个进程打开时，即使另一个进程删除了该文件，文件的实际数据也不会立即被清除，直到所有打开该文件的进程都关闭文件。
+
+- 此时，refcnt为0，但是inode在最后一个打开文件的进程调用CLOSE之间不会被释放回收。删除文件实际上是移除目录上指向该文件的最后一个名称（硬链接），而不是立即销毁文件数据。
+
+

@@ -70,7 +70,7 @@ date: 2026-06-17
 | **GELU**<br>(高斯误差线性单元) | $f(x)=x\Phi(x)$<br>*($\Phi(x)$为正态分布累积分布函数)*                                       | $\approx [-0.17, +\infty)$ | 全局平滑、非单调；在 $x=0$ 附近平滑过渡；结合了**随机正则化（Dropout）与激活函数**的双重思想。         | 现代 NLP / CV 大模型（如 **BERT、GPT 系列、Transformer、ViT**）的标配隐藏层激活函数。 |
 | **SiLU**<br>(Swish)    | $f(x)=\frac{x}{1+e^{-x}}$                                                         | $\approx [-0.28, +\infty)$ | **无上界、有下界、平滑、非单调**；具备自门控（Self-Gated）特性；深层网络中的表现通常优于 ReLU。        | 现代高效计算机视觉模型（如 **YOLOv5 / v7 / v8、EfficientNet**）的隐藏层。         |
 
-![](C:\Users\30884\AppData\Roaming\marktext\images\2026-06-16-17-13-38-image.png)
+<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-06-16-17-13-38-image.png" title="" alt="" width="615">
 
 ### 1.2 单层感知机的问题
 
@@ -78,7 +78,7 @@ date: 2026-06-17
   
   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpT8nROWLAPka3cnUkOjczE0ycYhnOeV08YQ&s" title="" alt="深度学习之(神经网络)单层感知器（python）（一）-腾讯云开发者社区-腾讯云" width="412">
 
-![单层感知机— PaddleEdu documentation](https://paddlepedia.readthedocs.io/en/latest/_images/xor.png)
+<img src="https://paddlepedia.readthedocs.io/en/latest/_images/xor.png" title="" alt="单层感知机— PaddleEdu documentation" width="663">
 
 ## 2 多层感知器
 
