@@ -1,5 +1,4 @@
 ---
-
 title: RAG:Retrieval-Augmented Generation
 category: tech
 tags: [RAG, LLM, Retrieval]
@@ -151,7 +150,7 @@ RAG发展经过了**原始RAG（naive RAG）、高级RAG（Advanced RAG）、模
 
 #### 2.2.4 模块化RAG六大板块和数学公式表达
 
-<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-05-18-19-32-42-image.png" title="" alt="" width="571">
+![](images/2026-05-18-19-32-42-image.png)
 
 - **索引过程**：给定文档集合$D = \{d_1, d_2, \dots, d_n\}$，其中$d_i$表示文档块。索引将文档块 $d_i$通过向量模型$f_e(·)$转换为向量，并存储在向量数据库中。
   
@@ -314,7 +313,7 @@ RAG发展经过了**原始RAG（naive RAG）、高级RAG（Advanced RAG）、模
 
 - 根据原始的Query**生成多个方面的Query**，然后利用RRF（Reciprocal Rank Fusion）技术，把多个结果融合，生成统一排名，增加最相关文档出现的机会
   
-  <img title="" src="https://i-blog.csdnimg.cn/direct/c49bb2a69ad6413d8a92988e297180f9.png#pic_center" alt="RAG通用范式：RAG的入门介绍与实践优化_通用rag-CSDN博客" width="795">
+  <img src="https://arxiv.org/html/2402.03367v2/extracted/5423757/Diag1.png" title="" alt="Refer to caption" width="535">
 
 #### 3.6.3 Query重写-MultiQuery
 
@@ -401,7 +400,7 @@ Hypothetical Embedding → Similarity Search → Relevant Documents
 
 IRCoT的想法是使用检索来指导思维链 （CoT） 推理步骤，并使用 CoT 推理来指导检索。下图显示了IRCoT检索方法的概述。
 
-![](https://pic4.zhimg.com/v2-dd0c8eb880dae07ba7cbb69ce26e4d6b_1440w.jpg)
+![](images/2026-08-06-17-33-27-image.png)
 
 - 首先使用问题作为查询来检索一组基本段落。
 
@@ -426,8 +425,6 @@ Least-to-Most教LLM如何通过将复杂问题，分解为一系列更简单的�
   - (2) 之前回答的子问题和生成的解决方案的潜在空列表
   
   - (3) 下一个需要回答的问题
-
-<img src="https://pic2.zhimg.com/v2-2ce81ba21e009b66d27dd18156cb3f05_1440w.jpg" title="" alt="" width="758">
 
 ### 3.7 检索器微调（Retrieval过程）
 
@@ -478,7 +475,7 @@ $Op$ 代表操作符
 
 ### 4.1 线性模式（Linear Pattern）
 
-<img title="" src="https://pic2.zhimg.com/v2-375a55c6c6432ea9f2c2988cdb6790b7_1440w.jpg" alt="" width="667">
+![](images/2026-08-06-17-33-48-image.png)
 
 $$
 P_{linear} = \{ M_{indexing} → M_{pre-retrieval} → M_{retrieval} → M_{post -retrieval} → M_{generate} \}
@@ -490,13 +487,13 @@ $$
 
 查询重写模块是基于T5-large微调的可训练小型语言模型，在强化学习中，重写器的优化被形式化为一个马尔可夫决策过程，LLM的最终输出作为奖励。检索器使用稀疏编码模型BM25。
 
-<img src="https://pic4.zhimg.com/v2-2d6646e6f860cceb83aa08c3b8a542b5_1440w.jpg" title="" alt="" width="665">
+<img src="images/2026-08-06-17-34-02-image.png" title="" alt="" width="747">
 
 ### 4.2 条件模式（Condition Pattern）
 
 条件结构的RAG流程根据不同条件选择适合的管道，通常，通过路由模块来决定下一步的模块选择。
 
-<img src="https://pica.zhimg.com/v2-37f69bdb7aa7d4678d550b529dd80b06_1440w.jpg" title="" alt="" width="663">
+<img src="images/2026-08-06-17-34-22-image.png" title="" alt="" width="744">
 
 管道的选择取决于查询的类型或内容，针对不同的场景执行相应的流程。例如，在处理严肃问题、政治话题或娱乐话题时，LLM生成内容的容忍度各不相同。这些路由流程在检索源、检索方式、配置、模型和提示词方面有所差异。
 
@@ -514,11 +511,11 @@ $f_r$ 表示基于路由函数的选择。
 
 - 预检索：每个分支分别执行检索和生成，最后将结果进行汇总。
 
-<img src="https://pic2.zhimg.com/v2-adfd7f9b72f707452df40977c320ac0f_1440w.jpg" title="" alt="" width="588">
+<img src="images/2026-08-06-17-34-42-image.png" title="" alt="" width="734">
 
 - 后检索：仅执行一次检索，然后对每个检索到的文档块分别进行生成，最后进行汇总。
 
-<img src="https://picx.zhimg.com/v2-cc8e1d372df7a9b743d15da0799f3f77_1440w.jpg" title="" alt="" width="586">
+<img src="images/2026-08-06-17-34-55-image.png" title="" alt="" width="734">
 
 在许多情况下，RAG 流系统可能会有多个并行运行的分支，通常是为了增加生成结果的多样性。
 
@@ -552,7 +549,7 @@ $$
 
 循环结构是模块化RAG的核心特征，涉及检索与生成步骤的相互依赖。
 
-<img src="https://pica.zhimg.com/v2-725868edc1d0d80a4586319d9cb67186_1440w.jpg" title="" alt="" width="673">
+<img src="images/2026-08-06-17-35-16-image.png" title="" alt="" width="704">
 
 循环模式可以分为**迭代、递归**和**自适应（主动）检索方式**。
 
@@ -566,7 +563,7 @@ $$
 
 一个典型的迭代检索案例是**ITER-RETGEN**，它迭代执行检索增强生成和生成增强检索。每次迭代中，ITER-RETGEN利用前一轮的生成结果作为上下文，帮助检索更相关的知识，循环在达到预设迭代次数后终止。
 
-<img src="https://pic2.zhimg.com/v2-6338ea690badc1c4e434c66a43fe0e03_1440w.jpg" title="" alt="" width="690">
+<img src="images/2026-08-06-17-35-35-image.png" title="" alt="" width="730">
 
 #### 4.4.2 递归模式
 
@@ -574,7 +571,7 @@ $$
 
 一个典型的递归检索例子是**澄清树（Tree of clarifications，ToC）**，它通过递归扩展澄清树，将初始的模糊问题转化为一系列明确的问题。当达到最大节点数或最大深度时，树的构建终止。最终，ToC整合所有有效节点，生成完整的长文本答案。
 
-<img src="https://picx.zhimg.com/v2-e3591624396e67edc0b632ea22624aaf_1440w.jpg" title="" alt="" width="708">
+<img src="images/2026-08-06-17-36-00-image.png" title="" alt="" width="738">
 
 #### 4.4.3 自适应模式
 
@@ -584,12 +581,12 @@ $$
 
 通过提示词工程来控制LLM的行为，典型例子是**FLARE**。其核心思想是，只有在知识缺乏时才进行检索，以避免不必要的检索。FLARE会生成临时句子，并检测是否存在低概率token。如果发现低概率token，系统会检索相关文档并重新生成句子。生成的临时答案会进行置信度评估，如果未达到所需的置信度水平，流程会返回到检索阶段并重新生成。评估标准通过提示词实现。
 
-<img src="https://pica.zhimg.com/v2-44cb4aa967a7df2c783f3022a174904e_1440w.jpg" title="" alt="" width="660">
+<img src="images/2026-08-06-17-36-16-image.png" title="" alt="" width="735">
 
 #### 4.4.5 基于微调的检索
 
 基于微调的检索。通过微调LLM生成特殊的token，触发检索或生成步骤。该概念源自Toolformer，在RAG系统中用于控制检索和生成。一个典型例子是Self-RAG，首先预测生成特定的“检索”token是否有助于增强生成过程，如果需要检索，模型生成批判token来评估检索段落的相关性，并最终选择最优结果作为最终输出。它提示GPT-4生成一个适合的指令微调数据集，以微调所部署的开源LLM。这样可以让模型在生成过程中输出四个特定的控制RAG流程的标记。
-<img src="https://pic4.zhimg.com/v2-23adead696df1dffb0fbc6fd327130f5_1440w.jpg" title="" alt="" width="663">
+<img title="" src="images/2026-08-06-17-36-27-image.png" alt="" width="732">
 
 ### 4.5 调优模式（Tuning Pattern）
 
@@ -604,7 +601,7 @@ $$
 - **语言模型监督检索（LSR）**。通过LLM生成的结果对检索器进行微调，提升其性能。
 - **基于LLM输出的强化学习**。依然使用LLM的输出结果作为监督信号，利用强化学习来使检索器与生成器保持一致。整个检索过程被分解为生成式马尔可夫链。
 
-<img src="https://pic2.zhimg.com/v2-22ac0bfe783fcf80980899ee147d2adb_1440w.jpg" title="" alt="" width="614">
+<img src="images/2026-08-06-17-36-40-image.png" title="" alt="" width="704">
 
 #### 4.5.2 生成器微调
 
@@ -614,10 +611,10 @@ $$
 - **蒸馏**。对于本地部署的开源模型，一种有效的优化方法是使用GPT-4批量构建微调数据，从而增强开源模型的能力。
 - **基于LLM/人类反馈的强化学习**。基于最终生成答案的反馈进行强化学习。除了人工评估，强大的LLM也可以作为评估工具，帮助改进模型的表现。
 
-<img src="https://pic3.zhimg.com/v2-3e1db501d6641566f2007e88a90b644a_1440w.jpg" title="" alt="" width="627">
+<img src="images/2026-08-06-17-36-53-image.png" title="" alt="" width="708">
 
 ### 4.5.3 双重微调
 
 在RAG系统中，同时对检索器和生成器进行微调是其独有的特性。系统微调的关键在于检索器与生成器的配合。一个典型的实现是**RA-DIT**，该系统同时微调LLM和检索器。LLM的微调部分旨在通过检索增强的指令提高生成正确答案的可能性；而检索器的微调部分则通过最小化检索评分分布与LLM偏好之间的KL散度来优化检索器。在这种模式中，检索器和生成器都会参与微调，并使它们的偏好对齐。
 
-<img src="https://pic3.zhimg.com/v2-bb87a687206071cd60b3c2fa32cb9552_1440w.jpg" title="" alt="" width="637">
+<img title="" src="images/2026-08-06-17-37-08-image.png" alt="" width="708">

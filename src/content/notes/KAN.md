@@ -166,7 +166,7 @@ $$
 
 ### 3.1 数学视角下的KAN
 
-![](C:\Users\30884\AppData\Roaming\marktext\images\2026-06-17-17-55-24-image.png)
+![](images/2026-06-17-17-55-24-image.png)
 
 - 假设第 $l$ 层输入：
   

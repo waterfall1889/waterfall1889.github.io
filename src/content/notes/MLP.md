@@ -28,7 +28,7 @@ date: 2026-06-17
 
 - 偏置量也是偏置阈值，生物神经元不会因为有一点刺激就放电。需要超过某个阈值。
 
-![](C:\Users\30884\AppData\Roaming\marktext\images\2026-06-16-17-12-07-image.png)
+![](images/2026-06-16-17-12-07-image.png)
 
 #### 1.1.2 加权求和
 
@@ -70,7 +70,7 @@ date: 2026-06-17
 | **GELU**<br>(高斯误差线性单元) | $f(x)=x\Phi(x)$<br>*($\Phi(x)$为正态分布累积分布函数)*                                       | $\approx [-0.17, +\infty)$ | 全局平滑、非单调；在 $x=0$ 附近平滑过渡；结合了**随机正则化（Dropout）与激活函数**的双重思想。         | 现代 NLP / CV 大模型（如 **BERT、GPT 系列、Transformer、ViT**）的标配隐藏层激活函数。 |
 | **SiLU**<br>(Swish)    | $f(x)=\frac{x}{1+e^{-x}}$                                                         | $\approx [-0.28, +\infty)$ | **无上界、有下界、平滑、非单调**；具备自门控（Self-Gated）特性；深层网络中的表现通常优于 ReLU。        | 现代高效计算机视觉模型（如 **YOLOv5 / v7 / v8、EfficientNet**）的隐藏层。         |
 
-<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-06-16-17-13-38-image.png" title="" alt="" width="615">
+![](images/2026-06-16-17-13-38-image.png)
 
 ### 1.2 单层感知机的问题
 
@@ -84,13 +84,13 @@ date: 2026-06-17
 
 MLP 是**层级化、全连接**的神经网络结构，层与层之间无跳过、无循环，神经元之间**全连接**（相邻层的任意两个神经元都有连接），整体分为3类核心层
 
-![](https://pic3.zhimg.com/v2-b35a72a5b9c5fbb493c72a9e4beb1fc2_1440w.jpg)
+![](images/2026-08-06-17-22-42-image.png)
 
 三层结构：Input layer输入层，Hidden layer隐藏层（一般多层），Output layer输出层
 
 **普适逼近原理**（Universal Approximation Theorem）：一个具有至少一层的隐含层的前馈神经网络，并且隐含层包含有限数量的神经元（即多层感知机），它可以以任意精度逼近任意一个定义在 $ℝ^𝒏$ 上的连续函数，这为神经网络的有效性给出了最基础的理论保障
 
-![](C:\Users\30884\AppData\Roaming\marktext\images\2026-06-16-17-16-13-image.png)
+![](images/2026-06-16-17-16-13-image.png)
 
 ### 2.1 输入层
 
@@ -130,7 +130,7 @@ MLP 是**层级化、全连接**的神经网络结构，层与层之间无跳过
 
 举例说明：现在有一个2层Hidden Layer的MLP，Input Layer 2个神经元，Hidden Layer第一层3个神经元，第二层2个神经元，Output Layer 1个神经元，用于做二分类任务。
 
-![](C:\Users\30884\AppData\Roaming\marktext\images\2026-06-16-17-55-24-image.png)
+![](images/2026-06-16-17-55-24-image.png)
 
 #### 2.4.1 初始化
 
@@ -167,13 +167,13 @@ MLP 是**层级化、全连接**的神经网络结构，层与层之间无跳过
   - $b^{(l)}$：该层的偏置
   - $f(⋅)$：激活函数（ReLU / Sigmoid / Tanh）
 
-<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-06-16-18-17-07-image.png" title="" alt="" width="403">
+![](images/2026-06-16-18-17-07-image.png)
 
 #### 2.4.3 反向传播（训练）
 
 - 计算损失函数对每个参数（W, b）的梯度，并据此更新参数，使损失下降。
 
-<img src="file:///C:/Users/30884/AppData/Roaming/marktext/images/2026-06-16-18-28-13-image.png" title="" alt="" width="373">
+![](images/2026-06-16-18-28-13-image.png)
 
 - 每一层的梯度 = 下一层传回来的误差 × 本层激活函数导数 × 本层输入
 

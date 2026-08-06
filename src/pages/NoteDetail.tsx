@@ -8,6 +8,17 @@ import { notes } from '../lib/notes'
 
 const categoryLabels = { course: 'Course', tech: 'Tech' } as const
 
+/** MarkText uses relative `images/...`; the site serves the same files from `/notes-images/`. */
+function resolveNoteImageSrc(src?: string) {
+  if (!src) return src
+  const relative = src.match(/^(?:\.\/)?images\/(.+)$/)
+  if (relative) return `/notes-images/${relative[1]}`
+  if (src.startsWith('/notes-images/')) return src
+  const marktext = src.match(/marktext[/\\]+images[/\\]+([^/\\?#]+)/i)
+  if (marktext) return `/notes-images/${marktext[1]}`
+  return src
+}
+
 export default function NoteDetail() {
   const { slug } = useParams<{ slug: string }>()
   const note = notes.find((n) => n.slug === slug)
@@ -39,7 +50,15 @@ export default function NoteDetail() {
         </div>
       )}
       <div className="note-content">
-        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeKatex]}
+          components={{
+            img: ({ src, alt, ...props }) => (
+              <img src={resolveNoteImageSrc(src)} alt={alt ?? ''} {...props} />
+            ),
+          }}
+        >
           {note.content}
         </ReactMarkdown>
       </div>

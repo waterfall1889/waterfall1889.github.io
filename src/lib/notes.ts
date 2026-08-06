@@ -15,9 +15,10 @@ const rawModules = import.meta.glob('/src/content/notes/*.md', {
 }) as Record<string, string>
 
 function parseFrontmatter(raw: string): { data: Record<string, string>; body: string } {
-  const match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
+  const normalized = raw.replace(/\r\n/g, '\n')
+  const match = normalized.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/)
   if (!match) {
-    return { data: {}, body: raw }
+    return { data: {}, body: normalized }
   }
 
   const [, frontmatter, body] = match

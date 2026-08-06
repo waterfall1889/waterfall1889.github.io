@@ -12,9 +12,7 @@ date: 2026-07-30
 
 MCP （Model Context Protocol，模型上下文协议）定义了应用程序和 AI 模型之间交换上下文信息的方式。这使得开发者能够**以一致的方式将各种数据源、工具和功能连接到 AI 模型**（一个中间协议层），就像 USB-C 让不同设备能够通过相同的接口连接一样。MCP 的目标是创建一个通用标准，使 AI 应用程序的开发和集成变得更加简单和统一。
 
-<img title="" src="https://pic4.zhimg.com/v2-3a242914e1f4958e631dd158e043b7c3_1440w.jpg" alt="" width="692">
-
-<img src="https://picx.zhimg.com/v2-9fe7fb51f264338a079a444eefa041b1_1440w.jpg" title="" alt="" width="705">
+![](images/2026-08-06-17-21-47-image.png)
 
 MCP 就是以更标准的方式让 LLM Chat 使用不同工具
 
@@ -102,7 +100,7 @@ MCP 不是“更好的 function call”，而是**Tool + Context + State 的统�
 
 ## 4 MCP架构
 
-<img src="https://pica.zhimg.com/v2-9d3681630ed930a8dc74d3b452c0cc94_1440w.jpg" title="" alt="" width="615">
+
 
 整个MCP主要有三部分：
 

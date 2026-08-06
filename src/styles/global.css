@@ -528,6 +528,13 @@ h3 {
   background: var(--color-accent-soft);
 }
 
+.note-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+}
+
 .site-footer {
   border-top: 1px solid var(--color-border);
   padding: 24px 0;
