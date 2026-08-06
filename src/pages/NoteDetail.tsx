@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
+import rehypeRaw from 'rehype-raw'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import { notes } from '../lib/notes'
@@ -52,10 +53,16 @@ export default function NoteDetail() {
       <div className="note-content">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeKatex]}
+          rehypePlugins={[rehypeRaw, rehypeKatex]}
           components={{
-            img: ({ src, alt, ...props }) => (
-              <img src={resolveNoteImageSrc(src)} alt={alt ?? ''} {...props} />
+            img: ({ node: _node, src, alt, width, height, ...props }) => (
+              <img
+                src={resolveNoteImageSrc(src)}
+                alt={alt ?? ''}
+                width={width}
+                height={height}
+                {...props}
+              />
             ),
           }}
         >

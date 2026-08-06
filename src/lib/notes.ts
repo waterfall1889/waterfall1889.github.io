@@ -60,10 +60,18 @@ function slugFromPath(path: string): string {
   return fileName.replace(/\.md$/, '')
 }
 
+/** Keep markdown as MarkText-relative `images/...`; rewrite only for the website. */
+function rewriteNoteImagePaths(body: string): string {
+  return body
+    .replace(/(src=["'])(?:\.\/)?images\//g, '$1/notes-images/')
+    .replace(/\]\((?:\.\/)?images\//g, '](/notes-images/')
+}
+
 export const notes: Note[] = Object.entries(rawModules)
   .map(([path, raw]) => {
     const { data, body } = parseFrontmatter(raw)
     const category = data.category === 'tech' ? 'tech' : 'course'
+    const content = rewriteNoteImagePaths(body)
 
     return {
       slug: slugFromPath(path),
@@ -72,7 +80,7 @@ export const notes: Note[] = Object.entries(rawModules)
       tags: parseTags(data.tags),
       date: data.date ?? '',
       excerpt: data.summary ?? makeExcerpt(body),
-      content: body,
+      content,
     } satisfies Note
   })
   .sort((a, b) => (a.date < b.date ? 1 : -1))
