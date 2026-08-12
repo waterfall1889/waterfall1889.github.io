@@ -71,7 +71,13 @@ function main() {
 
     text = text.replace(IMG_TAG_RE, (fullMatch, src) => {
       const name = collect(src)
-      return name ? `![](${mdUrl(name)})` : fullMatch
+      if (!name) return fullMatch
+      const width = (fullMatch.match(/\bwidth=["']?(\d+)/i) || [])[1]
+      const alt = (fullMatch.match(/\balt=["']([^"']*)["']/i) || [])[1] || ''
+      if (width) {
+        return `<img src="${mdUrl(name)}" alt="${alt}" width="${width}">`
+      }
+      return `![${alt}](${mdUrl(name)})`
     })
 
     text = text.replace(MD_LOCAL_RE, (fullMatch, alt, src) => {
