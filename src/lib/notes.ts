@@ -4,7 +4,6 @@ export interface Note {
   category: 'course' | 'tech'
   tags: string[]
   date: string
-  excerpt: string
   content: string
 }
 
@@ -43,18 +42,6 @@ function parseTags(value: string | undefined): string[] {
     .filter(Boolean)
 }
 
-function makeExcerpt(body: string, length = 160): string {
-  const plain = body
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/[#>*_`|-]/g, ' ')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  if (plain.length <= length) return plain
-  return `${plain.slice(0, length).trim()}...`
-}
-
 function slugFromPath(path: string): string {
   const fileName = path.split('/').pop() ?? path
   return fileName.replace(/\.md$/, '')
@@ -79,7 +66,6 @@ export const notes: Note[] = Object.entries(rawModules)
       category,
       tags: parseTags(data.tags),
       date: data.date ?? '',
-      excerpt: data.summary ?? makeExcerpt(body),
       content,
     } satisfies Note
   })

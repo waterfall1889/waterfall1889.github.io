@@ -406,43 +406,74 @@ h3 {
 .note-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .note-item {
   display: block;
-  padding: 20px 22px;
+  position: relative;
+  padding: 18px 22px 18px 24px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
   text-decoration: none;
   color: var(--color-text);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  overflow: hidden;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.note-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: transparent;
+  transition: background 0.18s ease;
 }
 
 .note-item:hover {
-  border-color: var(--color-accent);
+  border-color: #c9d7d1;
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
 }
 
-.note-header {
+.note-item:hover::before {
+  background: var(--color-accent);
+}
+
+.note-meta {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: baseline;
   gap: 12px;
-  flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 
-.note-header h3 {
+.note-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.note-item .tags {
+  margin-top: 12px;
 }
 
 .note-date {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 
@@ -451,18 +482,12 @@ h3 {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   color: var(--color-accent);
   background: var(--color-accent-soft);
   border-radius: 6px;
-  padding: 2px 8px;
-  margin-bottom: 8px;
-}
-
-.note-excerpt {
-  margin: 6px 0 0;
-  color: var(--color-muted);
-  font-size: 14px;
+  padding: 3px 8px;
+  margin-bottom: 0;
 }
 
 .note-content {

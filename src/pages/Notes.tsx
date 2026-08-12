@@ -16,7 +16,7 @@ export default function Notes() {
   const [category, setCategory] = useState<CategoryFilter>('all')
 
   const fuse = useMemo(
-    () => new Fuse(notes, { keys: ['title', 'tags', 'excerpt'], threshold: 0.35 }),
+    () => new Fuse(notes, { keys: ['title', 'tags'], threshold: 0.35 }),
     [],
   )
 
@@ -33,7 +33,7 @@ export default function Notes() {
         <input
           type="text"
           className="search-input"
-          placeholder="Search notes by title, tag, or content..."
+          placeholder="Search notes by title or tag..."
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -57,12 +57,11 @@ export default function Notes() {
         <div className="note-list">
           {filtered.map((note) => (
             <Link key={note.slug} to={`/notes/${note.slug}`} className="note-item">
-              <div className="note-header">
-                <h3>{note.title}</h3>
-                {note.date && <span className="note-date">{note.date}</span>}
+              <div className="note-meta">
+                <span className="category-badge">{categoryLabels[note.category]}</span>
+                {note.date && <time className="note-date">{note.date}</time>}
               </div>
-              <span className="category-badge">{categoryLabels[note.category]}</span>
-              <p className="note-excerpt">{note.excerpt}</p>
+              <h3 className="note-title">{note.title}</h3>
               {note.tags.length > 0 && (
                 <div className="tags">
                   {note.tags.map((tag) => (
