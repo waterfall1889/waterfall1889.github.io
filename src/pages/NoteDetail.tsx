@@ -39,8 +39,11 @@ export default function NoteDetail() {
         ← Back to notes
       </Link>
       <h1>{note.title}</h1>
-      {note.date && <p className="card-period">{note.date}</p>}
-      <span className="category-badge">{categoryLabels[note.category]}</span>
+      <div className="note-detail-meta">
+        {note.date && <time className="note-date">{note.date}</time>}
+        <span className="category-badge">{categoryLabels[note.category]}</span>
+        {note.group && <span className="group-badge">{note.group}</span>}
+      </div>
       {note.tags.length > 0 && (
         <div className="tags">
           {note.tags.map((tag) => (

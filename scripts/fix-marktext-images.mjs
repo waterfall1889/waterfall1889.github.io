@@ -34,6 +34,20 @@ function mdUrl(filename) {
   return `images/${filename}`
 }
 
+function findMarkdownFiles(dir) {
+  const files = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      if (entry.name === 'images') continue
+      files.push(...findMarkdownFiles(full))
+    } else if (entry.name.endsWith('.md')) {
+      files.push(full)
+    }
+  }
+  return files
+}
+
 function copyImage(srcPath, name) {
   for (const dir of [noteImagesDir, publicImagesDir]) {
     mkdirSync(dir, { recursive: true })
@@ -55,8 +69,7 @@ function main() {
   let copied = 0
   const missing = new Set()
 
-  for (const file of readdirSync(notesDir).filter((f) => f.endsWith('.md'))) {
-    const full = join(notesDir, file)
+  for (const full of findMarkdownFiles(notesDir)) {
     let text = readFileSync(full, 'utf8')
     const before = text
     const needed = new Map()
@@ -112,7 +125,7 @@ function main() {
     if (text !== before) {
       writeFileSync(full, text, 'utf8')
       rewritten += 1
-      console.log(`updated ${file}`)
+      console.log(`updated ${full}`)
     }
   }
 

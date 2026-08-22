@@ -9,6 +9,13 @@ const repoRoot = join(__dirname, '..')
 const notesDir = join(repoRoot, 'src', 'content', 'notes')
 
 const inputDir = process.argv[2] ? join(process.cwd(), process.argv[2]) : join(repoRoot, 'docx-notes')
+const groupArg = process.argv[3]
+
+if (!groupArg) {
+  console.error('Usage: npm run convert-notes -- <folder-with-docx-files> <GroupName(Course|Tech)>')
+  console.error('Example: npm run convert-notes -- docx-notes "Computer-System-Engineering(Course)"')
+  process.exit(1)
+}
 
 function slugify(name) {
   return name
@@ -24,11 +31,15 @@ function toFrontmatterDate(mtime) {
 function main() {
   if (!existsSync(inputDir)) {
     console.error(`Input folder not found: ${inputDir}`)
-    console.error('Usage: npm run convert-notes -- <folder-with-docx-files>')
+    console.error('Usage: npm run convert-notes -- <folder-with-docx-files> <GroupName(Course|Tech)>')
     process.exit(1)
   }
 
-  mkdirSync(notesDir, { recursive: true })
+  const groupMatch = groupArg.match(/\((course|tech)\)$/i)
+  const category = groupMatch && groupMatch[1].toLowerCase() === 'tech' ? 'tech' : 'course'
+  const groupDir = join(notesDir, groupArg)
+
+  mkdirSync(groupDir, { recursive: true })
 
   const docxFiles = readdirSync(inputDir).filter((file) => extname(file).toLowerCase() === '.docx')
 
@@ -44,7 +55,7 @@ function main() {
     const inputPath = join(inputDir, file)
     const title = basename(file, extname(file))
     const slug = slugify(title)
-    const outputPath = join(notesDir, `${slug}.md`)
+    const outputPath = join(groupDir, `${slug}.md`)
     const mediaDir = join(notesDir, 'assets', slug)
 
     try {
@@ -60,7 +71,7 @@ function main() {
         const frontmatter = [
           '---',
           `title: ${title}`,
-          'category: course',
+          `category: ${category}`,
           'tags: []',
           `date: ${toFrontmatterDate(mtime)}`,
           '---',
@@ -78,7 +89,7 @@ function main() {
 
   console.log('\nConversion summary:')
   for (const { file, slug } of converted) {
-    console.log(`  OK    ${file} -> src/content/notes/${slug}.md`)
+    console.log(`  OK    ${file} -> src/content/notes/${groupArg}/${slug}.md`)
   }
   for (const { file, error } of failed) {
     console.log(`  FAIL  ${file}: ${error}`)
