@@ -45,6 +45,7 @@ export default function Notes() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<CategoryFilter>('all')
   const [sort, setSort] = useState<SortMode>('date-asc')
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set())
 
   const fuse = useMemo(
     () => new Fuse(notes, { keys: ['title', 'tags', 'group'], threshold: 0.35 }),
@@ -69,6 +70,14 @@ export default function Notes() {
     return sortSections(Array.from(map.entries()))
   }, [filtered, sort])
 
+  const toggleSection = (group: string) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev)
+      if (next.has(group)) next.delete(group)
+      else next.add(group)
+      return next
+    })
+  }
   return (
     <section className="section">
       <div className="notes-heading">
@@ -125,40 +134,53 @@ export default function Notes() {
         <div className="note-sections">
           {sections.map(([sectionGroup, sectionNotes]) => {
             const sectionCategory = sectionNotes[0]?.category
+            const isCollapsed = collapsed.has(sectionGroup)
+            const panelId = `note-section-${sectionGroup.replace(/\s+/g, '-').toLowerCase()}`
             return (
-              <section key={sectionGroup} className="note-section">
-                <header className="note-section-header">
+              <section
+                key={sectionGroup}
+                className={isCollapsed ? 'note-section is-collapsed' : 'note-section'}
+              >
+                <button
+                  type="button"
+                  className="note-section-header"
+                  aria-expanded={!isCollapsed}
+                  aria-controls={panelId}
+                  onClick={() => toggleSection(sectionGroup)}
+                >
                   <div className="note-section-heading">
+                    <span className="note-section-chevron" aria-hidden="true" />
                     <h2 className="note-section-title">{sectionGroup}</h2>
                     {category === 'all' && sectionCategory && (
                       <span className="note-section-kind">{categoryLabels[sectionCategory]}</span>
                     )}
                   </div>
                   <span className="note-section-count">{sectionNotes.length}</span>
-                </header>
-                <div className="note-list">
-                  {sectionNotes.map((note) => (
-                    <Link key={note.slug} to={`/notes/${note.slug}`} className="note-item">
-                      <div className="note-item-main">
-                        <h3 className="note-title">{note.title}</h3>
-                        {note.date && <time className="note-date">{note.date}</time>}
-                      </div>
-                      {note.tags.length > 0 && (
-                        <div className="tags">
-                          {note.tags.map((tag) => (
-                            <span key={tag} className="tag">
-                              {tag}
-                            </span>
-                          ))}
+                </button>
+                {!isCollapsed && (
+                  <div className="note-list" id={panelId}>
+                    {sectionNotes.map((note) => (
+                      <Link key={note.slug} to={`/notes/${note.slug}`} className="note-item">
+                        <div className="note-item-main">
+                          <h3 className="note-title">{note.title}</h3>
+                          {note.date && <time className="note-date">{note.date}</time>}
                         </div>
-                      )}
-                    </Link>
-                  ))}
-                </div>
+                        {note.tags.length > 0 && (
+                          <div className="tags">
+                            {note.tags.map((tag) => (
+                              <span key={tag} className="tag">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </section>
             )
-          })}
-        </div>
+          })}        </div>
       )}
     </section>
   )
