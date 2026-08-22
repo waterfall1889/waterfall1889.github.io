@@ -62,8 +62,8 @@ function categoryAndGroupFromPath(path: string): { category: 'course' | 'tech'; 
 /** Keep markdown as MarkText-relative `images/...`; rewrite only for the website. */
 function rewriteNoteImagePaths(body: string): string {
   return body
-    .replace(/(src=["'])(?:\.\/)?images\//g, '$1/notes-images/')
-    .replace(/\]\((?:\.\/)?images\//g, '](/notes-images/')
+    .replace(/(src=["'])(?:\.\.\/|\.\/)?images\//g, '$1/notes-images/')
+    .replace(/\]\((?:\.\.\/|\.\/)?images\//g, '](/notes-images/')
 }
 
 export const notes: Note[] = Object.entries(rawModules)

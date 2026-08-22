@@ -1,5 +1,4 @@
 ---
-
 title: Remote Procedure Call
 category: Course
 tags: [RPC, Distributed Systems, Network]

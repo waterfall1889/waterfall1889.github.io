@@ -110,6 +110,19 @@ function main() {
       return `![${alt}](${mdUrl(name)})`
     })
 
+    // normalize ../images/ or ./images/ to images/ for nested note folders
+    text = text.replace(
+      /(<img\b[^>]*\bsrc=["']|\]\()(?:\.\.\/|\.\/)?images\//g,
+      (_, prefix) => `${prefix}images/`,
+    )
+
+    // sync repo-local images referenced in markdown into public/
+    for (const m of text.matchAll(/(?:src=["']|\]\()images\/([^"')]+)/g)) {
+      const name = m[1]
+      const notePath = join(noteImagesDir, name)
+      if (existsSync(notePath)) needed.set(name, notePath)
+    }
+
     for (const [name, fsPath] of needed) {
       if (!existsSync(fsPath)) {
         missing.add(fsPath)

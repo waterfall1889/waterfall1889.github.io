@@ -12,7 +12,7 @@ const categoryLabels = { course: 'Course', tech: 'Tech' } as const
 /** MarkText uses relative `images/...`; the site serves the same files from `/notes-images/`. */
 function resolveNoteImageSrc(src?: string) {
   if (!src) return src
-  const relative = src.match(/^(?:\.\/)?images\/(.+)$/)
+  const relative = src.match(/^(?:\.\.\/|\.\/)?images\/(.+)$/)
   if (relative) return `/notes-images/${relative[1]}`
   if (src.startsWith('/notes-images/')) return src
   const marktext = src.match(/marktext[/\\]+images[/\\]+([^/\\?#]+)/i)
