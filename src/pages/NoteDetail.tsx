@@ -6,6 +6,7 @@ import rehypeRaw from 'rehype-raw'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import { notes } from '../lib/notes'
+import { formatReadingTime, formatWordCount } from '../lib/noteStats'
 
 const categoryLabels = { course: 'Course', tech: 'Tech' } as const
 
@@ -39,6 +40,12 @@ export default function NoteDetail() {
         ← Back to notes
       </Link>
       <h1>{note.title}</h1>
+      <p className="note-reading-stats">
+        {formatWordCount(note.wordCount)} words
+        {note.imageCount > 0 && ` · ${note.imageCount} ${note.imageCount === 1 ? 'figure' : 'figures'}`}
+        {' · '}
+        {formatReadingTime(note.readingMinutes)}
+      </p>
       <div className="note-detail-meta">
         {note.date && <time className="note-date">{note.date}</time>}
         <span className="category-badge">{categoryLabels[note.category]}</span>

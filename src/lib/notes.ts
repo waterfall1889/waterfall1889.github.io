@@ -1,3 +1,9 @@
+import {
+  countImages,
+  countWords,
+  estimateReadingMinutes,
+} from './noteStats'
+
 export interface Note {
   slug: string
   title: string
@@ -6,6 +12,9 @@ export interface Note {
   tags: string[]
   date: string
   content: string
+  wordCount: number
+  imageCount: number
+  readingMinutes: number
 }
 
 const rawModules = import.meta.glob('/src/content/notes/**/*.md', {
@@ -80,6 +89,9 @@ export const notes: Note[] = Object.entries(rawModules)
       tags: parseTags(data.tags),
       date: data.date ?? '',
       content,
+      wordCount: countWords(body),
+      imageCount: countImages(body),
+      readingMinutes: estimateReadingMinutes(body),
     } satisfies Note
   })
   .sort((a, b) => (a.date < b.date ? 1 : -1))

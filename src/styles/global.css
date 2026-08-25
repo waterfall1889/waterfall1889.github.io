@@ -670,6 +670,13 @@ h3 {
   margin: 4px 0 4px;
 }
 
+.note-reading-stats {
+  margin: 6px 0 12px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 .note-detail-meta .note-date {
   margin-right: 4px;
 }
