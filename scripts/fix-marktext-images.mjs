@@ -1,26 +1,25 @@
 #!/usr/bin/env node
 /**
- * Copy MarkText local images into:
- *   - src/content/notes/images/  (relative paths work in MarkText)
- *   - public/notes-images/       (served by Vite / GitHub Pages)
- * Rewrite markdown to ![](images/<filename>).
+ * Copy MarkText local images into per-note folders under:
+ *   src/content/notes/images/<Group>/<NoteSlug>/
+ *   public/notes-images/<Group>/<NoteSlug>/
+ * Rewrite markdown to ../images/<Group>/<NoteSlug>/<filename>.
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { basename, join } from 'node:path'
+import { basename, dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const repoRoot = join(__dirname, '..')
 const notesDir = join(repoRoot, 'src', 'content', 'notes')
-const noteImagesDir = join(notesDir, 'images')
-const publicImagesDir = join(repoRoot, 'public', 'notes-images')
+const imagesRoot = join(notesDir, 'images')
+const publicRoot = join(repoRoot, 'public', 'notes-images')
 const marktextImages = join(process.env.APPDATA || '', 'marktext', 'images')
 
 const IMG_TAG_RE =
   /<img\b[^>]*\bsrc=["'](?:file:\/\/\/)?([A-Za-z]:[\\/][^"']+)["'][^>]*\/?>/gi
 const MD_LOCAL_RE =
   /!\[([^\]]*)\]\((?:file:\/\/\/)?([A-Za-z]:[\\/][^)]+)\)/g
-const MD_PUBLIC_RE = /!\[([^\]]*)\]\((?:\/notes-images\/)([^)]+)\)/g
 
 function toFsPath(ref) {
   return decodeURIComponent(ref.replace(/^file:\/\/\//i, '')).replace(/\//g, '\\')
@@ -30,16 +29,12 @@ function isMarktextImage(fsPath) {
   return fsPath.replace(/\//g, '\\').toLowerCase().includes('\\marktext\\images\\')
 }
 
-function mdUrl(filename) {
-  return `images/${filename}`
-}
-
 function findMarkdownFiles(dir) {
   const files = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name)
     if (entry.isDirectory()) {
-      if (entry.name === 'images') continue
+      if (entry.name === 'images' || entry.name === '整理前') continue
       files.push(...findMarkdownFiles(full))
     } else if (entry.name.endsWith('.md')) {
       files.push(full)
@@ -48,8 +43,22 @@ function findMarkdownFiles(dir) {
   return files
 }
 
-function copyImage(srcPath, name) {
-  for (const dir of [noteImagesDir, publicImagesDir]) {
+function noteImagePrefix(mdPath) {
+  const rel = relative(notesDir, mdPath).replace(/\\/g, '/')
+  const parts = rel.split('/')
+  const file = parts.pop()
+  const slug = file.replace(/\.md$/, '')
+  const group = parts.join('/')
+  return group ? `${group}/${slug}` : slug
+}
+
+function mdImageUrl(prefix, filename) {
+  return `../images/${prefix}/${filename}`
+}
+
+function copyImage(srcPath, prefix, name) {
+  for (const root of [imagesRoot, publicRoot]) {
+    const dir = join(root, prefix)
     mkdirSync(dir, { recursive: true })
     const dest = join(dir, name)
     if (!existsSync(dest)) copyFileSync(srcPath, dest)
@@ -62,14 +71,12 @@ function main() {
     process.exit(1)
   }
 
-  mkdirSync(noteImagesDir, { recursive: true })
-  mkdirSync(publicImagesDir, { recursive: true })
-
   let rewritten = 0
   let copied = 0
   const missing = new Set()
 
   for (const full of findMarkdownFiles(notesDir)) {
+    const prefix = noteImagePrefix(full)
     let text = readFileSync(full, 'utf8')
     const before = text
     const needed = new Map()
@@ -87,58 +94,30 @@ function main() {
       if (!name) return fullMatch
       const width = (fullMatch.match(/\bwidth=["']?(\d+)/i) || [])[1]
       const alt = (fullMatch.match(/\balt=["']([^"']*)["']/i) || [])[1] || ''
-      if (width) {
-        return `<img src="${mdUrl(name)}" alt="${alt}" width="${width}">`
-      }
-      return `![${alt}](${mdUrl(name)})`
+      if (width) return `<img src="${mdImageUrl(prefix, name)}" alt="${alt}" width="${width}">`
+      return `![${alt}](${mdImageUrl(prefix, name)})`
     })
 
     text = text.replace(MD_LOCAL_RE, (fullMatch, alt, src) => {
       const name = collect(src)
-      return name ? `![${alt}](${mdUrl(name)})` : fullMatch
+      return name ? `![${alt}](${mdImageUrl(prefix, name)})` : fullMatch
     })
-
-    // migrate previous absolute web paths to relative MarkText-friendly paths
-    text = text.replace(MD_PUBLIC_RE, (_, alt, name) => {
-      const srcPath = join(marktextImages, name)
-      const publicPath = join(publicImagesDir, name)
-      const notePath = join(noteImagesDir, name)
-      if (existsSync(srcPath)) needed.set(name, srcPath)
-      else if (existsSync(publicPath)) needed.set(name, publicPath)
-      else if (existsSync(notePath)) needed.set(name, notePath)
-      else missing.add(name)
-      return `![${alt}](${mdUrl(name)})`
-    })
-
-    // normalize ../images/ or ./images/ to images/ for nested note folders
-    text = text.replace(
-      /(<img\b[^>]*\bsrc=["']|\]\()(?:\.\.\/|\.\/)?images\//g,
-      (_, prefix) => `${prefix}images/`,
-    )
-
-    // sync repo-local images referenced in markdown into public/
-    for (const m of text.matchAll(/(?:src=["']|\]\()images\/([^"')]+)/g)) {
-      const name = m[1]
-      const notePath = join(noteImagesDir, name)
-      if (existsSync(notePath)) needed.set(name, notePath)
-    }
 
     for (const [name, fsPath] of needed) {
       if (!existsSync(fsPath)) {
         missing.add(fsPath)
         continue
       }
-      const beforeCount = [noteImagesDir, publicImagesDir].filter((dir) =>
-        existsSync(join(dir, name)),
-      ).length
-      copyImage(fsPath, name)
-      if (beforeCount < 2) copied += 1
+      const destNote = join(imagesRoot, prefix, name)
+      const had = existsSync(destNote)
+      copyImage(fsPath, prefix, name)
+      if (!had) copied += 1
     }
 
     if (text !== before) {
       writeFileSync(full, text, 'utf8')
       rewritten += 1
-      console.log(`updated ${full}`)
+      console.log(`updated ${relative(repoRoot, full)}`)
     }
   }
 

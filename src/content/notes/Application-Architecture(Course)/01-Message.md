@@ -167,7 +167,7 @@ Producer → Queue → Consumer
 
 - 某个订阅者事务失败，不影响其他订阅者
 
-![](images/2026-08-27-14-55-49-image.png)
+![](../images/Application-Architecture(Course)/01-Message/2026-08-27-14-55-49-image.png)
 
 #### 是否要求订阅者在线？
 
@@ -201,7 +201,7 @@ Producer → Queue → Consumer
 
 JMS Browser 提供了一种特殊的访问方式：它允许客户端直接通过 Broker 查看 Queue 中当前等待消费的消息，而不会成为这些消息的 Consumer。
 
-![](images/2026-08-27-15-07-37-image.png)
+![](../images/Application-Architecture(Course)/01-Message/2026-08-27-15-07-37-image.png)
 
 JMS 浏览器允许你“浏览”队列中的消息，并显示每条消息的消息头（header）信息。
 
@@ -217,7 +217,7 @@ RabbitMQ 是一个广泛使用的开源消息代理（Message Broker）和队列
 
 ### 5.1 架构组成
 
-<img src="images/2026-08-27-15-25-39-image.png" alt="" width="736">
+<img src="../images/Application-Architecture(Course)/01-Message/2026-08-27-15-25-39-image.png" alt="" width="736">
 
 - **Producer（生产者）**：产生并发送消息的应用程序。
 
@@ -305,7 +305,7 @@ RabbitMQ 是 message-oriented：重点是消息的路由与投递；Kafka 是 lo
 
 Kafka是一个流式消息处理工具，核心目标是：**高吞吐、可持久化、可扩展、可容错地传输与存储消息流**。
 
-![](images/2026-08-27-17-55-58-image.png)
+![](../images/Application-Architecture(Course)/01-Message/2026-08-27-17-55-58-image.png)
 
 ## 6.1 基本架构
 
@@ -353,7 +353,7 @@ Kafka是一个流式消息处理工具，核心目标是：**高吞吐、可持�
 
 事实上，Kafka Cluster 由多个 Broker 组成，各 Broker 共同承担 Partition 的存储、复制和请求处理；对于每个 Partition，其副本中会选举一个 Leader，其余为 Follower。消息中间件实际上是一个“邮局”。这种设计实现了异步处理。
 
-<img src="images/2026-01-11-00-17-02-image.png" alt="" width="517">
+<img src="../images/Application-Architecture(Course)/01-Message/2026-01-11-00-17-02-image.png" alt="" width="517">
 
 ### 6.2 Kafka partition日志设计
 
@@ -420,7 +420,7 @@ Kafka 的一个核心思想可以概括成：**消息的存储与消息的消费
 
 **多个消费者组可以同时从同一个日志中读取数据，并且各自独立地维护自己在该日志（或数据流）中的读取位置。**
 
-<img src="images/2026-08-27-18-54-44-image.png" alt="" width="308">
+<img src="../images/Application-Architecture(Course)/01-Message/2026-08-27-18-54-44-image.png" alt="" width="308">
 
 ### 6.5 备份
 

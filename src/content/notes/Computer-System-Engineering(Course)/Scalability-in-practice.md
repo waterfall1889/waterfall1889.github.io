@@ -17,7 +17,7 @@ Scalability的策略：
 
 - ①disaggregating application /data将应用程序与数据存储在架构上分离，实现独立扩展。
 
-![](images/2026-08-13-09-55-00-image.png)
+![](../images/Computer-System-Engineering(Course)/Scalability-in-practice/2026-08-13-09-55-00-image.png)
 
 1. 独立扩展能力
    数据库层：可根据事务处理需求单独扩容
@@ -31,7 +31,7 @@ Scalability的策略：
    成熟的商业支持和服务保障
 - ②Avoid the slow data accesses（Caching）
 
-![](images/2026-08-13-09-55-40-image.png)
+![](../images/Computer-System-Engineering(Course)/Scalability-in-practice/2026-08-13-09-55-40-image.png)
 
 大多数请求只访问数据的一小部分（局部性 / locality）。单机有缓存系统，例如 OS 的 page cache，但是单机的 DRAM 容量有限；因此推出了分布式缓存服务器。好处是可以使用大量缓存服务器，获得“超大的 DRAM 总容量”。
 
@@ -121,7 +121,7 @@ CDN（内容分发网络） 是一组分布式部署的缓存节点（cache serv
 
 划分不同功能的APP可以实现性能优化和扩展。
 
-<img src="images/2026-08-13-10-32-39-image.png" alt="" width="744">
+<img src="../images/Computer-System-Engineering(Course)/Scalability-in-practice/2026-08-13-10-32-39-image.png" alt="" width="744">
 
 可以使用容器进行不同的部署，还可以用K8s进行集群调度。
 不过，随着需求发展，同一个APP内部可能会有更复杂的需求。这可以通过分布式的计算框架解决。
@@ -244,7 +244,7 @@ CDN（内容分发网络） 是一组分布式部署的缓存节点（cache serv
 
 ## 8 CAP原则
 
-<img src="images/2026-08-13-11-02-05-image.png" alt="" width="742">
+<img src="../images/Computer-System-Engineering(Course)/Scalability-in-practice/2026-08-13-11-02-05-image.png" alt="" width="742">
 
 **Consistency, Availability & Partition tolerance**
 **理论上，在进行网络分区的情况下不可能同时达到一致性和高可用。**

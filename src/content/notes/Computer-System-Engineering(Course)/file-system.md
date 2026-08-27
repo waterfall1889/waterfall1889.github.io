@@ -18,7 +18,7 @@ date: 2025-10-30
 
 - **Has a name**：需要有自己的文件名
 
-<img src="images/2026-08-06-15-01-07-image.png" title="" alt="" width="645">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-01-07-image.png" title="" alt="" width="645">
 
 ## 2 两个重要的抽象
 
@@ -32,7 +32,7 @@ date: 2025-10-30
 
 ## 3 大数组文件系统
 
-<img src="images/2026-08-06-15-05-40-image.png" title="" alt="" width="406">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-05-40-image.png" title="" alt="" width="406">
 
 - 设计简单，而且一目了然
 
@@ -42,7 +42,7 @@ date: 2025-10-30
 
 ### 4.1 基本分级
 
-![](images/2026-08-06-16-12-04-image.png)
+![](../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-12-04-image.png)
 
 ### 4.2 L1:Block Layer
 
@@ -82,7 +82,7 @@ date: 2025-10-30
 
 ### 4.3 Free block管理：bitmap
 
-![](images/2026-08-06-17-48-12-image.png)
+![](../images/Computer-System-Engineering(Course)/file-system/2026-08-06-17-48-12-image.png)
 
 主要包括以下部分：
 
@@ -173,7 +173,7 @@ date: 2025-10-30
 
 每个文件对应一个 inode。在小文件中，inode 直接保存数据块的地址；大文件则使用“多级间接寻址”结构。
 
-<img src="images/2026-08-06-15-29-06-image.png" title="" alt="" width="828">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-29-06-image.png" title="" alt="" width="828">
 
 - ①直接块（Direct Blocks）
   inode 中包含若干个直接指针。每个直接指针直接指向一个数据块。
@@ -209,7 +209,7 @@ procedure INDEX_TO_BLOCK_NUMBER(inode i, integer index)-> integer // Simplified!
 
 上述的函数是一个将文件内偏移量转换为实际磁盘块的核心文件系统函数。它实现了从文件的逻辑视图到物理存储的映射。
 
-<img src="images/2026-08-06-15-37-42-image.png" title="" alt="" width="761">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-37-42-image.png" title="" alt="" width="761">
 
 第二个是一个简化版本（Simplified），假设 inode 的 block_nums 数组中，每个元素直接记录了文件第 index 个逻辑块对应的磁盘块号。在真实文件系统中，这个函数会更复杂：
 
@@ -221,7 +221,7 @@ procedure INDEX_TO_BLOCK_NUMBER(inode i, integer index)-> integer // Simplified!
 
 ### 4.6 L3:Inode Number Layer
 
-<img src="images/2026-08-06-15-38-58-image.png" title="" alt="" width="460">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-38-58-image.png" title="" alt="" width="460">
 
 - 拿到inode的一种表示方式：inode number
 
@@ -231,7 +231,7 @@ procedure INDEX_TO_BLOCK_NUMBER(inode i, integer index)-> integer // Simplified!
 
 ### 4.7 L4:File Name Layer
 
-![](images/2026-08-06-15-41-01-image.png)
+![](../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-41-01-image.png)
 
 file name layer，完全根据人的需要设计，从文件名映射到 Inode number。这个映射的数据结构存储于directory中。
 
@@ -241,7 +241,7 @@ Directory的存储两种策略：
 
 ①下图中Inode table之后的位置。
 
-<img src="images/2026-08-06-15-49-00-image.png" title="" alt="" width="500">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-49-00-image.png" title="" alt="" width="500">
 
 缺点是很难确定实际的空间大小。可能出现空间不够用或者浪费。
 
@@ -292,7 +292,7 @@ Directory的存储两种策略：
   
   - 唯一区别是文件的数据块内容类型不同。这使得文件系统代码：模块化、易于维护、易于扩展（例如挂载点、虚拟文件系统 VFS）。
 
-<img src="images/2026-08-06-15-52-29-image.png" title="" alt="" width="751">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-15-52-29-image.png" title="" alt="" width="751">
 
 获得文件名和所在目录后即可进行映射查找。Unix系统文件名最长限制是14个Bytes。如果某个目录有大量的文件，并不会出现问题，只需要使得directory更大即可。
 
@@ -306,17 +306,17 @@ Directory的存储两种策略：
   
   **注意：UNLINK 删除的只是“名字”，而非立刻删除文件内容；只有当最后一个名字被删除后，文件数据才会被真正释放；即使文件名被删，但只要进程仍打开该文件（文件描述符未关闭），内容仍可读写，直到引用计数清零（refcnt为0）。**
 
-![](images/2026-08-06-16-01-00-image.png)
+![](../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-01-00-image.png)
 
 - LINK与快捷方式不同，快捷方式本身需要新建文件，而Link不需要。
 
 - LINK不可以出现循环，否则会造成资源无法回收而泄露。
 
-<img src="images/2026-08-06-16-01-34-image.png" title="" alt="" width="764">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-01-34-image.png" title="" alt="" width="764">
 
 - 因此规定，目录不得进行Link，而regular file是可以的，这是为了避免循环。唯一的例外是”.”和”..”。前者是当前目录的自我引用，后者是是父目录的引用（根目录 / 的 .. 特殊情况：它指向自己）。
 
-<img src="images/2026-08-06-16-02-35-image.png" title="" alt="" width="706">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-02-35-image.png" title="" alt="" width="706">
 
 ### 4.9 Renaming
 
@@ -340,19 +340,19 @@ Directory的存储两种策略：
 
 ### 4.10 L6:Absolute Path Layer
 
-<img src="images/2026-08-06-16-09-05-image.png" title="" alt="" width="700">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-09-05-image.png" title="" alt="" width="700">
 
 根目录的. 和 .. 都指向自己
 
-<img src="images/2026-08-06-16-09-39-image.png" title="" alt="" width="734">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-09-39-image.png" title="" alt="" width="734">
 
 文件系统中负责把用户输入的绝对路径（如 /a/b/c）逐级查目录，最终定位到目标 inode 的抽象层。
 
 ### 4.11 L7:Symbolic Layer
 
-<img src="images/2026-08-06-16-11-52-image.png" title="" alt="" width="717">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-11-52-image.png" title="" alt="" width="717">
 
-<img src="images/2026-08-06-16-12-04-image.png" title="" alt="" width="764">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-12-04-image.png" title="" alt="" width="764">
 
 符号链接层是文件系统层次结构中的顶层，负责通过符号链接机制集成多个文件系统。
 
@@ -365,7 +365,7 @@ Directory的存储两种策略：
 Hard link没有增加新的Inode，只是修改了目录，增加了一条directory entry，实际不存在的文件不可能增加hard link；hard link不可能跨文件系统去构建链接，比如电脑磁盘无法为外部USB建立Hard link。Hard link是双向等价的。
 Symbolic link（soft link）可以跨文件系统建立，因为它着眼于路径。Symbolic link实际上基于L7，更高的层级。
 
-<img src="images/2026-08-06-16-13-42-image.png" title="" alt="" width="652">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-13-42-image.png" title="" alt="" width="652">
 
 Symbolic link拥有独立inode，支持指向目录和跨文件系统，目标删除后会造成链接失效（悬空链接）。Hard link实际上是对同一个文件对应的inode number产生的别名，而soft link则是利用路径和文件名形成映射。
 
@@ -381,7 +381,7 @@ Symbolic link拥有独立inode，支持指向目录和跨文件系统，目标�
 
 - 软链接：链接文件 → 自己的 inode → 保存目标路径 → 再次路径解析，本质是路径的快捷方式。
 
-<img src="images/2026-08-06-16-16-00-image.png" title="" alt="" width="715">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-16-00-image.png" title="" alt="" width="715">
 
 **案例解释：**
 
@@ -422,7 +422,7 @@ cd ..
 
 - 由于buffer存在，通常fopen会比open快很多，且减少了系统调用次数，适合频繁小数据读写。不过，fopen/fwrite实际上无法保证现在一定把数据写入磁盘，fsync后可以保证落盘。Open/write则可以保证一定落盘。
 
-<img src="images/2026-08-06-16-34-22-image.png" title="" alt="" width="677">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-34-22-image.png" title="" alt="" width="677">
 
 - 由此可以看出，**Inode 不包含文件名，文件名不是文件的一部分**
 
@@ -486,7 +486,7 @@ Cursor可以选择是否share。
     
     - 操作互不影响
 
-<img src="images/2026-08-06-16-48-54-image.png" title="" alt="" width="790">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-06-16-48-54-image.png" title="" alt="" width="790">
 
 读写/更新的顺序也会影响性能以及安全性。
 
@@ -561,7 +561,7 @@ fsync() 是操作系统提供的系统调用，用于要求操作系统：将某
 
 每个块中保存“下一块的地址”。最后一个块用特殊标记表示 EOF。
 
-<img src="images/2026-08-25-09-16-15-image.png" alt="" width="507">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-25-09-16-15-image.png" alt="" width="507">
 
 优点：
 
@@ -581,7 +581,7 @@ fsync() 是操作系统提供的系统调用，用于要求操作系统：将某
 
 ### 6.3 FAT文件系统
 
-<img src="images/2026-08-25-09-19-04-image.png" alt="" width="414">
+<img src="../images/Computer-System-Engineering(Course)/file-system/2026-08-25-09-19-04-image.png" alt="" width="414">
 
 这是一个古老的的文件系统，目前主流计算机被其他现代文件系统取代，但是依然广泛运用在SD卡、相机存储等领域。
 

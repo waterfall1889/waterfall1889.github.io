@@ -166,7 +166,7 @@ $$
 
 ### 3.1 数学视角下的KAN
 
-![](images/2026-06-17-17-55-24-image.png)
+![](../images/AI-Agent(Tech)/KAN/2026-06-17-17-55-24-image.png)
 
 - 假设第 $l$ 层输入：
   

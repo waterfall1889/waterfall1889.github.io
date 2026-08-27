@@ -1,9 +1,9 @@
-----
+---
 title: Atomicity and Crash Recovery
 category: Course
 tags: [Distributed System, Concurrency, Transaction Management]
 date: 2025-11-12
-----
+---
 
 # Atomicity and Crash Recovery
 
@@ -123,20 +123,4 @@ Journaling实际上也有缺陷，**日志占用大量空间，会造成在下�
 
 我们可以这样认为，**Transaction本质是一种标记，标记哪些事情需要原子化**
 
-<img src="images/2026-08-25-17-08-35-image.png" alt="" width="522">
-
-| 阶段    | 英文名称                                    | 状态              | 是否可以 Abort / Rollback | 核心含义                                                                                                             |
-| ----- | --------------------------------------- | --------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **①** | **First step of all-or-nothing action** | 事务开始            | 可以                    | 事务从这里开始执行，例如修改数据库记录、更新文件系统 metadata、写入日志。这是“一系列原子操作”的起点。                                                         |
-| **②** | **Pre-commit discipline**               | **未提交**         | 可以                    | 事务尚未真正提交，修改仍属于暂存状态，可以随时中止并回滚，不应对外产生不可逆的影响。                                                                       |
-| **③** | **Commit-point**                        | **已提交（Commit）** | 不可回退                  | **关键分界点。** 一旦越过 commit point，事务被认为已经成功提交，从 `nothing` 进入 `all`。系统必须保证提交结果最终能够持久化；通常要求相关 WAL / journal 已经安全写入稳定存储。 |
-| **④** | **Post-commit discipline**              | **已提交但未完全完成**   | 不可回退                  | 主存储中的最终修改可能尚未全部完成，但已经有持久化日志保证其最终完成。若此时崩溃，恢复过程通过 **redo** 等机制继续完成事务。                                              |
-| **⑤** | **Last step of all-or-nothing action**  | **完全完成**        | 不可回退                  | 事务执行结束，所有修改已经完成并持久化到主数据存储中。事务从“已提交但尚未完全应用”进入最终完成状态。                                                              |
-
-Logging很大的不同在于，没写完的logging可以舍弃，而写完的logging则可以在崩溃时恢复数据，因此logging可以很好实现“all-or-nothing”。对于数据库而言logging是最常用的atomicity方法。
-
-**Logging 通常以 transaction 为核心抽象，将一组相关修改作为一个逻辑整体记录，并通过 commit/abort 等机制实现原子性和恢复。Journaling 则主要将日志机制应用于文件系统 crash consistency，通过记录文件系统状态修改及其提交状态，使系统崩溃后能够恢复到一致状态。**
-
-### 5.1 Redo-only Logging
-
-<img src="images/2026-08-26-23-35-02-image.png" alt="" width="448">
+<img src="../images/Computer-System-Engineering(Course)/Atomicity/2026-08-26-23-35-02-image.png" alt="" width="448">

@@ -10,14 +10,20 @@ import { formatReadingTime, formatWordCount } from '../lib/noteStats'
 
 const categoryLabels = { course: 'Course', tech: 'Tech' } as const
 
-/** MarkText uses relative `images/...`; the site serves the same files from `/notes-images/`. */
+/** Resolve note-relative image paths to /notes-images/ URLs for the site. */
 function resolveNoteImageSrc(src?: string) {
   if (!src) return src
   const relative = src.match(/^(?:\.\.\/|\.\/)?images\/(.+)$/)
-  if (relative) return `/notes-images/${relative[1]}`
+  if (relative) {
+    const encoded = relative[1]
+      .split('/')
+      .map((segment) => encodeURIComponent(segment))
+      .join('/')
+    return `/notes-images/${encoded}`
+  }
   if (src.startsWith('/notes-images/')) return src
   const marktext = src.match(/marktext[/\\]+images[/\\]+([^/\\?#]+)/i)
-  if (marktext) return `/notes-images/${marktext[1]}`
+  if (marktext) return `/notes-images/${encodeURIComponent(marktext[1])}`
   return src
 }
 
