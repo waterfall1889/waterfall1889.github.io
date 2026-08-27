@@ -1,10 +1,8 @@
 ----
-
 title: Atomicity and Crash Recovery
 category: Course
 tags: [Distributed System, Concurrency, Transaction Management]
 date: 2025-11-12
-
 ----
 
 # Atomicity and Crash Recovery
