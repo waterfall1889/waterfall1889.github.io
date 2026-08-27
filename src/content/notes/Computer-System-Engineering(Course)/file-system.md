@@ -604,7 +604,7 @@ fsync() 是操作系统提供的系统调用，用于要求操作系统：将某
   | 3              | 15                  |
   | 15             | EOF                 |
   
-  那么，实际的文件存储：**Cluster 2->Cluster 7->Cluster 2->Cluster 15**
+  那么，实际的文件存储：**Cluster 2->Cluster 7->Cluster 3->Cluster 15**
   
   - 若存储的值为0，那么代表簇空闲
   

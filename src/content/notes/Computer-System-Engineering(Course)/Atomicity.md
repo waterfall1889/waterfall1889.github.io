@@ -1,9 +1,11 @@
----
+----
+
 title: Atomicity and Crash Recovery
 category: Course
 tags: [Distributed System, Concurrency, Transaction Management]
 date: 2025-11-12
----
+
+----
 
 # Atomicity and Crash Recovery
 
@@ -115,8 +117,6 @@ Journaling实际上也有缺陷，**日志占用大量空间，会造成在下�
   | **data=ordered**   | **仅元数据**（但保证数据先落盘） | **这是大多数 Linux 发行版的默认模式**。先写入用户数据到主数据区，**再**将元数据变更写入日志。 | **性能与安全的良好平衡**。保证在元数据日志提交前，相关用户数据已存在磁盘上。即使崩溃，文件大小正确，读取不会得到垃圾数据。 | 不保证用户数据的即时持久化（若数据写入后、元数据提交前断电，数据可能丢失，但文件系统结构不受损）。   |
   | **data=writeback** | **仅元数据**           | 数据与元数据完全独立写入，不保证顺序。元数据日志可能先于数据落盘。                      | **性能最高**（接近无日志的异步模式）。                                           | **最不安全**。崩溃时，文件可能指向尚未写入的磁盘块，读取到完全随机的旧数据（数据损坏风险）。    |
 
-- 使用 fsync 系统调用：同步刷新数据到磁盘，等待数据完全写入后再继续后续操作
-
 ## 5 Logging For Atomicity
 
 这是更加通用的做法，思想和journaling有类似之处。核心思想是记录日志信息，使得我们可以完成崩溃后的恢复。
@@ -139,4 +139,6 @@ Logging很大的不同在于，没写完的logging可以舍弃，而写完的log
 
 **Logging 通常以 transaction 为核心抽象，将一组相关修改作为一个逻辑整体记录，并通过 commit/abort 等机制实现原子性和恢复。Journaling 则主要将日志机制应用于文件系统 crash consistency，通过记录文件系统状态修改及其提交状态，使系统崩溃后能够恢复到一致状态。**
 
+### 5.1 Redo-only Logging
 
+<img src="images/2026-08-26-23-35-02-image.png" alt="" width="448">
