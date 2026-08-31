@@ -212,9 +212,7 @@ REST（Representational State Transfer）是一种 Web 架构风格，强调**�
 
 ### 6.1 服务注册 / 发现流程
 
-<img src="../images/Application-Architecture(Course)/06-Application-Architecture/2026-01-12-16-42-20-image.png" alt="客户端服务发现与负载均衡" width="560">
-
-上图是常见的**客户端服务发现**模式，典型闭环如下：
+一个常见的**客户端服务发现**模式，典型闭环如下：
 
 1. **服务注册（Service Registration）**：服务实例启动后向**服务发现 API / 注册中心**登记自身信息；注册中心侧常配合 **KV 存储**持久化元数据。
 2. **定期拉取服务列表**：调用方内嵌的 Client 定期向注册中心请求可用实例列表，并缓存在本地。
