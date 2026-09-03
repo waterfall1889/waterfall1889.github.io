@@ -350,7 +350,84 @@ password + salt_B → Hash → yyy
 
 ### 4.1 Kerberos 协议
 
-**Kerberos** 是一种**基于票据（Ticket）的网络认证协议**，由麻省理工学院（MIT）开发，用于在不安全网络中安全验证用户与服务身份，并天然支持 SSO。
+**Kerberos** 是一种**基于票据（Ticket）的网络认证协议**，用于在不安全网络中安全验证用户与服务身份，并天然支持 SSO。
+
+**重要概念**：
+
+- Principal：可以认为是 Kerberos 的用户名，用于标识身份。
+  
+  ```
+  primary[/instance]@realm
+  ```
+  
+  - principal 主要由三部分构成：**primary，instance(可选) 和 realm**。
+    
+    - **primary**：主体名称，类似用户名。
+    
+    - **instance**：实例名，可选，通常用于区分不同角色或服务。
+    
+    - **realm**：所属的 Kerberos 管理域。
+  
+  - 包含 instance 的principal，一般会作为server端的principal
+  
+  - 不含有 instance 的principal，一般会作为客户端的principal，用于身份认证。
+  
+  例如：
+  
+  ```
+  alice@EXAMPLE.COM
+  ```
+  
+  表示 `EXAMPLE.COM` Realm 中的用户 Alice。
+  
+  而：
+  
+  ```
+  HTTP/web.example.com@EXAMPLE.COM
+  ```
+  
+  表示 `EXAMPLE.COM` Realm 中，运行在 `web.example.com` 上的 HTTP 服务。
+
+- Keytab（Key Table） 可以理解为一种机器/服务使用的“密钥表”文件。
+  
+  它通常包含一个或多个 principal 以及与其对应的长期密钥（long-term key），而不是直接保存用户明文密码。
+
+- **Ticket Cache（票据缓存）** 是客户端保存 Kerberos **票据和相关会话信息**的缓存。
+  
+  客户端完成 Kerberos 认证后，可以在本地缓存：
+  
+  - **TGT（Ticket Granting Ticket）**
+  - 服务票据（Service Ticket）
+  - 与这些票据相关的会话信息
+  
+  之后访问其他 Kerberos 服务时，可以直接利用缓存中的票据，而不必每次重新输入密码。
+  
+  票据具有**有效期**。在允许的情况下，可以通过 **renew** 延长某些票据的有效时间。
+
+- **Realm** 是 Kerberos 中用于划分不同 Kerberos 管理域的**命名空间（namespace）**。Realm 用于区分不同的 Kerberos 管理域；principal 通常以 `name@REALM` 的形式标识身份。
+
+```
+EXAMPLE.COM
+ ├── alice@EXAMPLE.COM
+ ├── bob@EXAMPLE.COM
+ └── server@EXAMPLE.COM
+
+TEST.COM
+ ├── alice@TEST.COM
+ └── server@TEST.COM
+```
+
+其中，虽然两个 Realm 中可能存在同名的用户，但：
+
+```
+alice@EXAMPLE.COM
+
+alice@TEST.COM
+```
+
+是两个不同的 Kerberos principal。
+
+<img src="../images/Application-Architecture(Course)/08-Architecture-Security/2026-09-03-12-55-36-image.png" alt="" width="683">
 
 ### 4.2 核心组件
 
@@ -359,6 +436,14 @@ password + salt_B → Hash → yyy
 | **KDC（密钥分发中心）** | 认证核心，包含 **AS**（认证服务器）与 **TGS**（票据授予服务器） |
 | **客户端**         | 需要访问服务的用户 / 应用                          |
 | **服务端**         | 提供具体业务服务的服务器                            |
+
+KDC主要是三个最重要的部分：
+
+- **KDC DB：** 包含了一个 Realm 中所有的 principal、密码与其他信息。
+
+- **Authentication Centre**：进行用户信息认证，为客户端提供 Ticket Granting Tickets(TGT)。
+
+- **Ticket Granting Server**：验证 TGT 与 Authenticator，为客户端提供 Service Tickets。
 
 ### 4.3 三步流程
 
