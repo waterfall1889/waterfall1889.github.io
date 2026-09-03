@@ -2,7 +2,7 @@
 title: MySQL Optimization
 category: Course
 tags: [MySQL, Application Architecture, Database, Relational Database]
-date: 2025-09-21
+date: 2025-09-20
 ---
 
 # MySQL Optimization
