@@ -1,0 +1,28 @@
+---
+description: Always read Agent.md first; enforce notes migration freeze and data-integrity rules
+alwaysApply: true
+---
+
+# Mandatory: read Agent.md before every task
+
+**Before starting any user task**, read the full contents of:
+
+`Agent.md`
+
+(at the repository root)
+
+Then follow it for the entire task. Do not skip this step.
+
+## Freeze (summary — full text in Agent.md)
+
+Until the user explicitly says「解除冻结」:
+
+- Do not run `migrate-note-images`, `fix-note-images`, `convert-notes`, or the corresponding `scripts/*.mjs`
+- Do not batch-delete/overwrite notes or images
+- Do not AI-rewrite existing note bodies to “fix” them
+- Batch writes require dry-run + explicit approval
+- Stop on truncation / large line-count drops / unexpected deletion
+
+Incident: `5cfaa46` deleted ~651 lines across RPC / DFS / Consistency.
+
+**Default: no delete, no overwrite, no auto-convert, no auto-rewrite of user notes.**

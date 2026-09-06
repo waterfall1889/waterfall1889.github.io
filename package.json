@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "convert-notes": "node scripts/convert-docx.mjs",
-    "fix-note-images": "node scripts/fix-marktext-images.mjs",
-    "migrate-note-images": "node scripts/migrate-note-images.mjs"
+    "convert-notes": "node -e \"console.error('FROZEN: convert-notes disabled until explicit unfreeze (see .cursor/rules/notes-migration-freeze.mdc)'); process.exit(1)\"",
+    "fix-note-images": "node -e \"console.error('FROZEN: fix-note-images disabled until explicit unfreeze (see .cursor/rules/notes-migration-freeze.mdc)'); process.exit(1)\"",
+    "migrate-note-images": "node -e \"console.error('FROZEN: migrate-note-images disabled until explicit unfreeze (see .cursor/rules/notes-migration-freeze.mdc)'); process.exit(1)\""
   },
   "dependencies": {
     "fuse.js": "^7.0.0",
